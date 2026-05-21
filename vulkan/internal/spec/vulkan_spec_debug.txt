@@ -1,0 +1,774 @@
+Vulkan Registry XML tree (debug)
+Source: /home/user/Git Repos/Projects/vertex-siege/libs/gpuarch/vulkan/internal/spec/vulkan_spec.xml
+Debug output: /home/user/Git Repos/Projects/vertex-siege/libs/gpuarch/vulkan/internal/spec/vulkan_spec_debug.txt
+
+=== Registry summary (depth-1 sections) ===
+Root: <registry> (388 top-level children)
+  <comment> → 0 children text="Copyright 2015-2026 The Khronos Group Inc.\n\nSPDX-License-Identifier: Apache-2.0 OR MIT"
+  <comment> → 0 children text="This file, vk.xml, is the Vulkan API Registry. It is a critically important\nand normative part of the Vulkan Specificati..."
+  <platforms> comment="Vulkan platform names, reserved for use with platform- and window system-specific extensions" → 18 children
+  <tags> comment="Vulkan vendor/author tags for extensions and layers" → 43 children
+  <types> comment="Vulkan type definitions" → 2676 children
+  <comment> → 0 children text="Vulkan enumerant (token) definitions"
+  <enums> name="API Constants" type="constants" comment="Vulkan hardcoded constants - not an enumerated type, part of the header boilerplate" → 38 children
+  <comment> → 0 children text="Unlike OpenGL, most tokens in Vulkan are actual typed enumerants in\n        their own numeric namespaces. The \"name\" att..."
+  <enums> name="VkImageLayout" type="enum" → 9 children
+  <enums> name="VkAttachmentLoadOp" type="enum" → 3 children
+  <enums> name="VkAttachmentStoreOp" type="enum" → 2 children
+  <enums> name="VkImageType" type="enum" → 3 children
+  <enums> name="VkImageTiling" type="enum" → 2 children
+  <enums> name="VkImageViewType" type="enum" → 7 children
+  <enums> name="VkCommandBufferLevel" type="enum" → 2 children
+  <enums> name="VkComponentSwizzle" type="enum" → 7 children
+  <enums> name="VkDescriptorType" type="enum" → 11 children
+  <enums> name="VkQueryType" type="enum" → 3 children
+  <enums> name="VkBorderColor" type="enum" → 6 children
+  <enums> name="VkPipelineBindPoint" type="enum" → 2 children
+  <enums> name="VkPipelineCacheHeaderVersion" type="enum" → 1 children
+  <enums> name="VkPipelineCacheCreateFlagBits" type="bitmask" → 0 children
+  <enums> name="VkPrimitiveTopology" type="enum" → 11 children
+  <enums> name="VkSharingMode" type="enum" → 2 children
+  <enums> name="VkIndexType" type="enum" → 2 children
+  <enums> name="VkFilter" type="enum" → 2 children
+  <enums> name="VkSamplerMipmapMode" type="enum" → 2 children
+  <enums> name="VkSamplerAddressMode" type="enum" → 5 children
+  <enums> name="VkCompareOp" type="enum" → 8 children
+  <enums> name="VkPolygonMode" type="enum" → 3 children
+  <enums> name="VkFrontFace" type="enum" → 2 children
+  <enums> name="VkBlendFactor" type="enum" → 19 children
+  <enums> name="VkBlendOp" type="enum" → 5 children
+  <enums> name="VkStencilOp" type="enum" → 8 children
+  <enums> name="VkLogicOp" type="enum" → 16 children
+  <enums> name="VkInternalAllocationType" type="enum" → 1 children
+  <enums> name="VkSystemAllocationScope" type="enum" → 5 children
+  <enums> name="VkPhysicalDeviceType" type="enum" → 5 children
+  <enums> name="VkVertexInputRate" type="enum" → 2 children
+  <enums> name="VkFormat" type="enum" comment="Vulkan format definitions" → 185 children
+  <enums> name="VkStructureType" type="enum" comment="Structure type enumerant" → 49 children
+  <enums> name="VkSubpassContents" type="enum" → 2 children
+  <enums> name="VkResult" type="enum" comment="API result codes" → 22 children
+  <enums> name="VkDynamicState" type="enum" → 9 children
+  <enums> name="VkDescriptorUpdateTemplateType" type="enum" → 1 children
+  <enums> name="VkObjectType" type="enum" comment="Enums to track objects of various types - also see objtypeenum attributes on type tags" → 26 children
+  <enums> name="VkRayTracingInvocationReorderModeEXT" type="enum" → 2 children
+  <enums> name="VkRayTracingLssIndexingModeNV" type="enum" → 2 children
+  <enums> name="VkRayTracingLssPrimitiveEndCapsModeNV" type="enum" → 2 children
+  <enums> name="VkDirectDriverLoadingModeLUNARG" type="enum" → 2 children
+  <enums> name="VkAntiLagModeAMD" type="enum" → 3 children
+  <enums> name="VkAntiLagStageAMD" type="enum" → 2 children
+  <comment> → 0 children text="Flags"
+  <enums> name="VkQueueFlagBits" type="bitmask" → 4 children
+  <enums> name="VkCullModeFlagBits" type="bitmask" → 4 children
+  <enums> name="VkRenderPassCreateFlagBits" type="bitmask" → 0 children
+  <enums> name="VkDeviceQueueCreateFlagBits" type="bitmask" → 0 children
+  <enums> name="VkMemoryPropertyFlagBits" type="bitmask" → 5 children
+  <enums> name="VkMemoryHeapFlagBits" type="bitmask" → 1 children
+  <enums> name="VkAccessFlagBits" type="bitmask" → 17 children
+  <enums> name="VkBufferUsageFlagBits" type="bitmask" → 9 children
+  <enums> name="VkBufferUsageFlagBits2" type="bitmask" bitwidth="64" → 9 children
+  <enums> name="VkBufferCreateFlagBits" type="bitmask" → 3 children
+  <enums> name="VkShaderStageFlagBits" type="bitmask" → 8 children
+  <enums> name="VkImageUsageFlagBits" type="bitmask" → 8 children
+  <enums> name="VkImageCreateFlagBits" type="bitmask" → 5 children
+  <enums> name="VkImageViewCreateFlagBits" type="bitmask" → 0 children
+  <enums> name="VkSamplerCreateFlagBits" type="bitmask" → 0 children
+  <enums> name="VkPipelineCreateFlagBits" type="bitmask" → 3 children
+  <enums> name="VkPipelineCreateFlagBits2" type="bitmask" bitwidth="64" → 9 children
+  <enums> name="VkPipelineShaderStageCreateFlagBits" type="bitmask" → 0 children
+  <enums> name="VkColorComponentFlagBits" type="bitmask" → 4 children
+  <enums> name="VkFenceCreateFlagBits" type="bitmask" → 1 children
+  <enums> name="VkSemaphoreCreateFlagBits" type="bitmask" → 0 children
+  <enums> name="VkFormatFeatureFlagBits" type="bitmask" → 13 children
+  <enums> name="VkQueryControlFlagBits" type="bitmask" → 1 children
+  <enums> name="VkQueryResultFlagBits" type="bitmask" → 4 children
+  <enums> name="VkCommandBufferUsageFlagBits" type="bitmask" → 3 children
+  <enums> name="VkQueryPipelineStatisticFlagBits" type="bitmask" → 11 children
+  <enums> name="VkMemoryMapFlagBits" type="bitmask" → 0 children
+  <enums> name="VkImageAspectFlagBits" type="bitmask" → 4 children
+  <enums> name="VkSparseImageFormatFlagBits" type="bitmask" → 3 children
+  <enums> name="VkSparseMemoryBindFlagBits" type="bitmask" → 1 children
+  <enums> name="VkPipelineStageFlagBits" type="bitmask" → 17 children
+  <enums> name="VkCommandPoolCreateFlagBits" type="bitmask" → 2 children
+  <enums> name="VkCommandPoolResetFlagBits" type="bitmask" → 1 children
+  <enums> name="VkCommandBufferResetFlagBits" type="bitmask" → 1 children
+  <enums> name="VkSampleCountFlagBits" type="bitmask" → 7 children
+  <enums> name="VkAttachmentDescriptionFlagBits" type="bitmask" → 1 children
+  <enums> name="VkStencilFaceFlagBits" type="bitmask" → 4 children
+  <enums> name="VkDescriptorPoolCreateFlagBits" type="bitmask" → 1 children
+  <enums> name="VkDependencyFlagBits" type="bitmask" → 1 children
+  <enums> name="VkSemaphoreType" type="enum" → 2 children
+  <enums> name="VkSemaphoreWaitFlagBits" type="bitmask" → 1 children
+  <comment> → 0 children text="WSI Extensions"
+  <enums> name="VkPresentModeKHR" type="enum" → 4 children
+  <enums> name="VkColorSpaceKHR" type="enum" → 2 children
+  <enums> name="VkDisplayPlaneAlphaFlagBitsKHR" type="bitmask" → 4 children
+  <enums> name="VkCompositeAlphaFlagBitsKHR" type="bitmask" → 4 children
+  <enums> name="VkSurfaceTransformFlagBitsKHR" type="bitmask" → 9 children
+  <enums> name="VkDisplaySurfaceStereoTypeNV" type="enum" → 4 children
+  <enums> name="VkSwapchainImageUsageFlagBitsANDROID" type="bitmask" → 1 children
+  <enums> name="VkTimeDomainKHR" type="enum" → 4 children
+  <enums> name="VkDebugReportFlagBitsEXT" type="bitmask" → 5 children
+  <enums> name="VkDebugReportObjectTypeEXT" type="enum" → 35 children
+  <enums> name="VkDeviceMemoryReportEventTypeEXT" type="enum" → 5 children
+  <enums> name="VkRasterizationOrderAMD" type="enum" → 2 children
+  <enums> name="VkExternalMemoryHandleTypeFlagBitsNV" type="bitmask" → 4 children
+  <enums> name="VkExternalMemoryFeatureFlagBitsNV" type="bitmask" → 3 children
+  <enums> name="VkClusterAccelerationStructureIndexFormatFlagBitsNV" type="bitmask" → 3 children
+  <enums> name="VkClusterAccelerationStructureTypeNV" type="enum" → 3 children
+  <enums> name="VkClusterAccelerationStructureOpTypeNV" type="enum" → 6 children
+  <enums> name="VkClusterAccelerationStructureOpModeNV" type="enum" → 3 children
+  <enums> name="VkClusterAccelerationStructureClusterFlagBitsNV" type="bitmask" → 1 children
+  <enums> name="VkClusterAccelerationStructureGeometryFlagBitsNV" type="bitmask" → 3 children
+  <enums> name="VkClusterAccelerationStructureAddressResolutionFlagBitsNV" type="bitmask" → 7 children
+  <enums> name="VkValidationCheckEXT" type="enum" → 2 children
+  <enums> name="VkValidationFeatureEnableEXT" type="enum" → 5 children
+  <enums> name="VkValidationFeatureDisableEXT" type="enum" → 8 children
+  <enums> name="VkLayerSettingTypeEXT" type="enum" → 8 children
+  <enums> name="VkSubgroupFeatureFlagBits" type="bitmask" → 8 children
+  <enums> name="VkIndirectCommandsLayoutUsageFlagBitsNV" type="bitmask" → 3 children
+  <enums> name="VkIndirectStateFlagBitsNV" type="bitmask" → 1 children
+  <enums> name="VkIndirectCommandsTokenTypeNV" type="enum" → 8 children
+  <enums> name="VkPrivateDataSlotCreateFlagBits" type="bitmask" → 0 children
+  <enums> name="VkDescriptorSetLayoutCreateFlagBits" type="bitmask" → 0 children
+  <enums> name="VkExternalMemoryHandleTypeFlagBits" type="bitmask" → 7 children
+  <enums> name="VkExternalMemoryFeatureFlagBits" type="bitmask" → 3 children
+  <enums> name="VkExternalSemaphoreHandleTypeFlagBits" type="bitmask" → 6 children
+  <enums> name="VkExternalSemaphoreFeatureFlagBits" type="bitmask" → 2 children
+  <enums> name="VkSemaphoreImportFlagBits" type="bitmask" → 1 children
+  <enums> name="VkExternalFenceHandleTypeFlagBits" type="bitmask" → 4 children
+  <enums> name="VkExternalFenceFeatureFlagBits" type="bitmask" → 2 children
+  <enums> name="VkFenceImportFlagBits" type="bitmask" → 1 children
+  <enums> name="VkSurfaceCounterFlagBitsEXT" type="bitmask" → 2 children
+  <enums> name="VkDisplayPowerStateEXT" type="enum" → 3 children
+  <enums> name="VkDeviceEventTypeEXT" type="enum" → 1 children
+  <enums> name="VkDisplayEventTypeEXT" type="enum" → 1 children
+  <enums> name="VkPeerMemoryFeatureFlagBits" type="bitmask" → 4 children
+  <enums> name="VkMemoryAllocateFlagBits" type="bitmask" → 1 children
+  <enums> name="VkDeviceGroupPresentModeFlagBitsKHR" type="bitmask" → 4 children
+  <enums> name="VkSwapchainCreateFlagBitsKHR" type="bitmask" → 0 children
+  <enums> name="VkViewportCoordinateSwizzleNV" type="enum" → 8 children
+  <enums> name="VkDiscardRectangleModeEXT" type="enum" → 2 children
+  <enums> name="VkSubpassDescriptionFlagBits" type="bitmask" → 0 children
+  <enums> name="VkPointClippingBehavior" type="enum" → 2 children
+  <enums> name="VkSamplerReductionMode" type="enum" → 3 children
+  <enums> name="VkTessellationDomainOrigin" type="enum" → 2 children
+  <enums> name="VkSamplerYcbcrModelConversion" type="enum" → 5 children
+  <enums> name="VkSamplerYcbcrRange" type="enum" → 2 children
+  <enums> name="VkChromaLocation" type="enum" → 2 children
+  <enums> name="VkBlendOverlapEXT" type="enum" → 3 children
+  <enums> name="VkCoverageModulationModeNV" type="enum" → 4 children
+  <enums> name="VkCoverageReductionModeNV" type="enum" → 2 children
+  <enums> name="VkValidationCacheHeaderVersionEXT" type="enum" → 1 children
+  <enums> name="VkShaderInfoTypeAMD" type="enum" → 3 children
+  <enums> name="VkQueueGlobalPriority" type="enum" → 4 children
+  <enums> name="VkDebugUtilsMessageSeverityFlagBitsEXT" type="bitmask" → 4 children
+  <enums> name="VkDebugUtilsMessageTypeFlagBitsEXT" type="bitmask" → 3 children
+  <enums> name="VkConservativeRasterizationModeEXT" type="enum" → 3 children
+  <enums> name="VkDescriptorBindingFlagBits" type="bitmask" → 4 children
+  <enums> name="VkVendorId" type="enum" → 10 children
+  <enums> name="VkDriverId" type="enum" → 30 children
+  <enums> name="VkConditionalRenderingFlagBitsEXT" type="bitmask" → 1 children
+  <enums> name="VkResolveModeFlagBits" type="bitmask" → 5 children
+  <enums> name="VkShadingRatePaletteEntryNV" type="enum" → 12 children
+  <enums> name="VkCoarseSampleOrderTypeNV" type="enum" → 4 children
+  <enums> name="VkGeometryInstanceFlagBitsKHR" type="bitmask" → 5 children
+  <enums> name="VkGeometryFlagBitsKHR" type="bitmask" → 2 children
+  <enums> name="VkBuildAccelerationStructureFlagBitsKHR" type="bitmask" → 5 children
+  <enums> name="VkAccelerationStructureCreateFlagBitsKHR" type="bitmask" → 1 children
+  <enums> name="VkCopyAccelerationStructureModeKHR" type="enum" → 2 children
+  <enums> name="VkBuildAccelerationStructureModeKHR" type="enum" → 2 children
+  <enums> name="VkAccelerationStructureTypeKHR" type="enum" → 3 children
+  <enums> name="VkGeometryTypeKHR" type="enum" → 3 children
+  <enums> name="VkAccelerationStructureMemoryRequirementsTypeNV" type="enum" → 3 children
+  <enums> name="VkAccelerationStructureBuildTypeKHR" type="enum" → 3 children
+  <enums> name="VkRayTracingShaderGroupTypeKHR" type="enum" → 3 children
+  <enums> name="VkAccelerationStructureCompatibilityKHR" type="enum" → 2 children
+  <enums> name="VkShaderGroupShaderKHR" type="enum" → 4 children
+  <enums> name="VkMemoryOverallocationBehaviorAMD" type="enum" → 3 children
+  <enums> name="VkFramebufferCreateFlagBits" type="bitmask" → 0 children
+  <enums> name="VkQueryPoolCreateFlagBits" type="bitmask" → 0 children
+  <enums> name="VkDeviceDiagnosticsConfigFlagBitsNV" type="bitmask" → 4 children
+  <enums> name="VkPipelineCreationFeedbackFlagBits" type="bitmask" → 3 children
+  <enums> name="VkFullScreenExclusiveEXT" type="enum" → 4 children
+  <enums> name="VkPerformanceCounterScopeKHR" type="enum" → 6 children
+  <enums> name="VkMemoryDecompressionMethodFlagBitsEXT" type="bitmask" bitwidth="64" → 2 children
+  <enums> name="VkPerformanceCounterUnitKHR" type="enum" → 11 children
+  <enums> name="VkPerformanceCounterStorageKHR" type="enum" → 6 children
+  <enums> name="VkPerformanceCounterDescriptionFlagBitsKHR" type="bitmask" → 4 children
+  <enums> name="VkAcquireProfilingLockFlagBitsKHR" type="bitmask" → 0 children
+  <enums> name="VkShaderCorePropertiesFlagBitsAMD" type="bitmask" → 0 children
+  <enums> name="VkRefreshObjectFlagBitsKHR" type="bitmask" → 0 children
+  <enums> name="VkPerformanceConfigurationTypeINTEL" type="enum" → 1 children
+  <enums> name="VkQueryPoolSamplingModeINTEL" type="enum" → 1 children
+  <enums> name="VkPerformanceOverrideTypeINTEL" type="enum" → 2 children
+  <enums> name="VkPerformanceParameterTypeINTEL" type="enum" → 2 children
+  <enums> name="VkPerformanceValueTypeINTEL" type="enum" → 5 children
+  <enums> name="VkShaderFloatControlsIndependence" type="enum" → 3 children
+  <enums> name="VkPipelineExecutableStatisticFormatKHR" type="enum" → 4 children
+  <enums> name="VkLineRasterizationMode" type="enum" → 4 children
+  <enums> name="VkShaderModuleCreateFlagBits" type="bitmask" → 0 children
+  <enums> name="VkPipelineCompilerControlFlagBitsAMD" type="bitmask" → 0 children
+  <enums> name="VkFaultLevel" type="enum" → 4 children
+  <enums> name="VkFaultType" type="enum" → 7 children
+  <enums> name="VkFaultQueryBehavior" type="enum" → 1 children
+  <enums> name="VkToolPurposeFlagBits" type="bitmask" → 5 children
+  <enums> name="VkPipelineMatchControl" type="enum" → 1 children
+  <enums> name="VkFragmentShadingRateCombinerOpKHR" type="enum" → 5 children
+  <enums> name="VkFragmentShadingRateNV" type="enum" → 12 children
+  <enums> name="VkFragmentShadingRateTypeNV" type="enum" → 2 children
+  <enums> name="VkSubpassMergeStatusEXT" type="enum" → 14 children
+  <enums> name="VkAccessFlagBits2" type="bitmask" bitwidth="64" → 22 children
+  <enums> name="VkPipelineStageFlagBits2" type="bitmask" bitwidth="64" → 27 children
+  <enums> name="VkSubmitFlagBits" type="bitmask" → 1 children
+  <enums> name="VkEventCreateFlagBits" type="bitmask" → 0 children
+  <enums> name="VkPipelineLayoutCreateFlagBits" type="bitmask" → 0 children
+  <enums> name="VkSciSyncClientTypeNV" type="enum" → 3 children
+  <enums> name="VkSciSyncPrimitiveTypeNV" type="enum" → 2 children
+  <enums> name="VkProvokingVertexModeEXT" type="enum" → 2 children
+  <enums> name="VkPipelineCacheValidationVersion" type="enum" → 1 children
+  <enums> name="VkAccelerationStructureMotionInstanceTypeNV" type="enum" → 3 children
+  <enums> name="VkPipelineColorBlendStateCreateFlagBits" type="bitmask" → 0 children
+  <enums> name="VkPipelineDepthStencilStateCreateFlagBits" type="bitmask" → 0 children
+  <enums> name="VkGraphicsPipelineLibraryFlagBitsEXT" type="bitmask" → 4 children
+  <enums> name="VkRenderingAttachmentFlagBitsKHR" type="bitmask" → 0 children
+  <enums> name="VkResolveImageFlagBitsKHR" type="bitmask" → 0 children
+  <enums> name="VkDeviceAddressBindingFlagBitsEXT" type="bitmask" → 1 children
+  <enums> name="VkDeviceAddressBindingTypeEXT" type="enum" → 2 children
+  <enums> name="VkFrameBoundaryFlagBitsEXT" type="bitmask" → 1 children
+  <enums> name="VkPresentScalingFlagBitsKHR" type="bitmask" → 6 children
+  <enums> name="VkPresentGravityFlagBitsKHR" type="bitmask" → 6 children
+  <enums> name="VkPhysicalDeviceSchedulingControlsFlagBitsARM" type="bitmask" bitwidth="64" → 2 children
+  <enums> name="VkPresentStageFlagBitsEXT" type="bitmask" → 4 children
+  <enums> name="VkPastPresentationTimingFlagBitsEXT" type="bitmask" → 2 children
+  <enums> name="VkPresentTimingInfoFlagBitsEXT" type="bitmask" → 2 children
+  <enums> name="VkVideoCodecOperationFlagBitsKHR" type="bitmask" → 1 children
+  <enums> name="VkVideoChromaSubsamplingFlagBitsKHR" type="bitmask" comment="Vulkan video chroma subsampling definitions" → 5 children
+  <enums> name="VkVideoComponentBitDepthFlagBitsKHR" type="bitmask" comment="Vulkan video component bit depth definitions" → 4 children
+  <enums> name="VkVideoCapabilityFlagBitsKHR" type="bitmask" → 2 children
+  <enums> name="VkVideoSessionCreateFlagBitsKHR" type="bitmask" → 1 children
+  <enums> name="VkVideoSessionParametersCreateFlagBitsKHR" type="bitmask" → 0 children
+  <enums> name="VkVideoDecodeH264PictureLayoutFlagBitsKHR" type="bitmask" → 3 children
+  <enums> name="VkVideoCodingControlFlagBitsKHR" type="bitmask" → 1 children
+  <enums> name="VkQueryResultStatusKHR" type="enum" → 3 children
+  <enums> name="VkVideoDecodeUsageFlagBitsKHR" type="bitmask" → 4 children
+  <enums> name="VkVideoDecodeCapabilityFlagBitsKHR" type="bitmask" → 2 children
+  <enums> name="VkVideoEncodeFlagBitsKHR" type="bitmask" → 0 children
+  <enums> name="VkVideoEncodeUsageFlagBitsKHR" type="bitmask" → 5 children
+  <enums> name="VkVideoEncodeContentFlagBitsKHR" type="bitmask" → 4 children
+  <enums> name="VkVideoEncodeTuningModeKHR" type="enum" → 5 children
+  <enums> name="VkVideoEncodeCapabilityFlagBitsKHR" type="bitmask" → 2 children
+  <enums> name="VkVideoEncodeFeedbackFlagBitsKHR" type="bitmask" → 3 children
+  <enums> name="VkVideoEncodeRateControlModeFlagBitsKHR" type="bitmask" → 4 children
+  <enums> name="VkVideoEncodeIntraRefreshModeFlagBitsKHR" type="bitmask" → 5 children
+  <enums> name="VkVideoEncodeH264CapabilityFlagBitsKHR" type="bitmask" → 9 children
+  <enums> name="VkVideoEncodeH264StdFlagBitsKHR" type="bitmask" → 20 children
+  <enums> name="VkVideoEncodeH264RateControlFlagBitsKHR" type="bitmask" → 5 children
+  <enums> name="VkHostImageCopyFlagBits" type="bitmask" → 2 children
+  <enums> name="VkPartitionedAccelerationStructureOpTypeNV" type="enum" → 3 children
+  <enums> name="VkPartitionedAccelerationStructureInstanceFlagBitsNV" type="bitmask" → 5 children
+  <enums> name="VkImageFormatConstraintsFlagBitsFUCHSIA" type="bitmask" → 0 children
+  <enums> name="VkImageConstraintsInfoFlagBitsFUCHSIA" type="bitmask" → 5 children
+  <enums> name="VkFormatFeatureFlagBits2" type="bitmask" bitwidth="64" → 27 children
+  <enums> name="VkRenderingFlagBits" type="bitmask" → 3 children
+  <enums> name="VkVideoEncodeH265CapabilityFlagBitsKHR" type="bitmask" → 10 children
+  <enums> name="VkVideoEncodeH265StdFlagBitsKHR" type="bitmask" → 21 children
+  <enums> name="VkVideoEncodeH265RateControlFlagBitsKHR" type="bitmask" → 5 children
+  <enums> name="VkVideoEncodeH265CtbSizeFlagBitsKHR" type="bitmask" → 3 children
+  <enums> name="VkVideoEncodeH265TransformBlockSizeFlagBitsKHR" type="bitmask" → 4 children
+  <enums> name="VkVideoEncodeAV1CapabilityFlagBitsKHR" type="bitmask" → 5 children
+  <enums> name="VkVideoEncodeAV1StdFlagBitsKHR" type="bitmask" → 4 children
+  <enums> name="VkVideoEncodeAV1RateControlFlagBitsKHR" type="bitmask" → 4 children
+  <enums> name="VkVideoEncodeAV1SuperblockSizeFlagBitsKHR" type="bitmask" → 2 children
+  <enums> name="VkVideoEncodeAV1PredictionModeKHR" type="enum" → 4 children
+  <enums> name="VkVideoEncodeAV1RateControlGroupKHR" type="enum" → 3 children
+  <enums> name="VkExportMetalObjectTypeFlagBitsEXT" type="bitmask" → 6 children
+  <enums> name="VkInstanceCreateFlagBits" type="bitmask" → 0 children
+  <enums> name="VkImageCompressionFlagBitsEXT" type="bitmask" → 4 children
+  <enums> name="VkImageCompressionFixedRateFlagBitsEXT" type="bitmask" → 25 children
+  <enums> name="VkPipelineRobustnessBufferBehavior" type="enum" → 4 children
+  <enums> name="VkPipelineRobustnessImageBehavior" type="enum" → 4 children
+  <enums> name="VkOpticalFlowGridSizeFlagBitsNV" type="bitmask" → 5 children
+  <enums> name="VkOpticalFlowUsageFlagBitsNV" type="bitmask" → 6 children
+  <enums> name="VkOpticalFlowPerformanceLevelNV" type="enum" → 4 children
+  <enums> name="VkOpticalFlowSessionBindingPointNV" type="enum" → 9 children
+  <enums> name="VkOpticalFlowSessionCreateFlagBitsNV" type="bitmask" → 5 children
+  <enums> name="VkOpticalFlowExecuteFlagBitsNV" type="bitmask" → 1 children
+  <enums> name="VkMicromapTypeEXT" type="enum" → 1 children
+  <enums> name="VkBuildMicromapFlagBitsEXT" type="bitmask" → 3 children
+  <enums> name="VkMicromapCreateFlagBitsEXT" type="bitmask" → 1 children
+  <enums> name="VkCopyMicromapModeEXT" type="enum" → 4 children
+  <enums> name="VkBuildMicromapModeEXT" type="enum" → 1 children
+  <enums> name="VkOpacityMicromapFormatKHR" type="enum" → 2 children
+  <enums> name="VkOpacityMicromapSpecialIndexKHR" type="enum" → 4 children
+  <enums> name="VkAccelerationStructureSerializedBlockTypeKHR" type="enum" → 1 children
+  <enums> name="VkDepthBiasRepresentationEXT" type="enum" → 3 children
+  <enums> name="VkDeviceFaultFlagBitsKHR" type="bitmask" → 6 children
+  <enums> name="VkDeviceFaultAddressTypeKHR" type="enum" → 7 children
+  <enums> name="VkDeviceFaultVendorBinaryHeaderVersionKHR" type="enum" → 2 children
+  <enums> name="VkIndirectCommandsLayoutUsageFlagBitsEXT" type="bitmask" → 2 children
+  <enums> name="VkIndirectExecutionSetInfoTypeEXT" type="enum" → 2 children
+  <enums> name="VkIndirectCommandsInputModeFlagBitsEXT" type="bitmask" → 2 children
+  <enums> name="VkIndirectCommandsTokenTypeEXT" type="enum" → 10 children
+  <enums> name="VkDisplacementMicromapFormatNV" type="enum" → 3 children
+  <enums> name="VkShaderCreateFlagBitsEXT" type="bitmask" → 1 children
+  <enums> name="VkShaderCodeTypeEXT" type="enum" → 2 children
+  <enums> name="VkScopeKHR" type="enum" → 4 children
+  <enums> name="VkComponentTypeKHR" type="enum" → 11 children
+  <enums> name="VkCubicFilterWeightsQCOM" type="enum" → 4 children
+  <enums> name="VkBlockMatchWindowCompareModeQCOM" type="enum" → 2 children
+  <enums> name="VkPhysicalDeviceLayeredApiKHR" type="enum" → 5 children
+  <enums> name="VkLayeredDriverUnderlyingApiMSFT" type="enum" → 2 children
+  <enums> name="VkLatencyMarkerNV" type="enum" → 12 children
+  <enums> name="VkOutOfBandQueueTypeNV" type="enum" → 2 children
+  <enums> name="VkMemoryUnmapFlagBits" type="bitmask" → 0 children
+  <enums> name="VkCompressedTriangleFormatAMDX" type="enum" → 1 children
+  <enums> name="VkWaylandSurfaceCreateFlagBitsKHR" type="bitmask" → 0 children
+  <enums> name="VkDepthClampModeEXT" type="enum" → 2 children
+  <enums> name="VkAccessFlagBits3KHR" type="bitmask" bitwidth="64" → 1 children
+  <enums> name="VkTileShadingRenderPassFlagBitsQCOM" type="bitmask" → 2 children
+  <enums> name="VkCooperativeVectorMatrixLayoutNV" type="enum" → 4 children
+  <enums> name="VkAddressCopyFlagBitsKHR" type="bitmask" → 3 children
+  <enums> name="VkTensorCreateFlagBitsARM" type="bitmask" bitwidth="64" → 2 children
+  <enums> name="VkTensorUsageFlagBitsARM" type="bitmask" bitwidth="64" → 4 children
+  <enums> name="VkTensorTilingARM" type="enum" → 2 children
+  <enums> name="VkTensorViewCreateFlagBitsARM" type="bitmask" bitwidth="64" → 0 children
+  <enums> name="VkDefaultVertexAttributeValueKHR" type="enum" → 2 children
+  <enums> name="VkDataGraphPipelineSessionCreateFlagBitsARM" type="bitmask" bitwidth="64" → 1 children
+  <enums> name="VkDataGraphPipelineSessionBindPointARM" type="enum" → 1 children
+  <enums> name="VkDataGraphPipelineSessionBindPointTypeARM" type="enum" → 1 children
+  <enums> name="VkDataGraphPipelinePropertyARM" type="enum" → 2 children
+  <enums> name="VkDataGraphPipelineDispatchFlagBitsARM" type="bitmask" bitwidth="64" → 0 children
+  <enums> name="VkPhysicalDeviceDataGraphProcessingEngineTypeARM" type="enum" → 1 children
+  <enums> name="VkPhysicalDeviceDataGraphOperationTypeARM" type="enum" → 1 children
+  <enums> name="VkDataGraphModelCacheTypeQCOM" type="enum" → 1 children
+  <enums> name="VkPerfHintTypeQCOM" type="enum" → 4 children
+  <enums> name="VkThrottleHintTypeSEC" type="enum" → 3 children
+  <enums> name="VkVideoEncodeRgbModelConversionFlagBitsVALVE" type="bitmask" → 5 children
+  <enums> name="VkVideoEncodeRgbRangeCompressionFlagBitsVALVE" type="bitmask" → 2 children
+  <enums> name="VkVideoEncodeRgbChromaOffsetFlagBitsVALVE" type="bitmask" → 2 children
+  <enums> name="VkSwapchainImageUsageFlagBitsOHOS" type="bitmask" → 1 children
+  <enums> name="VkDescriptorMappingSourceEXT" type="enum" → 9 children
+  <enums> name="VkSpirvResourceTypeFlagBitsEXT" type="bitmask" → 9 children
+  <enums> name="VkGpaSqShaderStageFlagBitsAMD" type="bitmask" → 7 children
+  <enums> name="VkGpaPerfBlockAMD" type="enum" → 59 children
+  <enums> name="VkGpaSampleTypeAMD" type="enum" → 3 children
+  <enums> name="VkGpaDeviceClockModeAMD" type="enum" → 6 children
+  <enums> name="VkAddressCommandFlagBitsKHR" type="bitmask" → 4 children
+  <enums> name="VkDataGraphTOSAQualityFlagBitsARM" type="bitmask" → 4 children
+  <enums> name="VkDataGraphTOSALevelARM" type="enum" → 2 children
+  <enums> name="VkDataGraphOpticalFlowGridSizeFlagBitsARM" type="bitmask" → 5 children
+  <enums> name="VkDataGraphOpticalFlowImageUsageFlagBitsARM" type="bitmask" → 5 children
+  <enums> name="VkDataGraphOpticalFlowPerformanceLevelARM" type="enum" → 4 children
+  <enums> name="VkDataGraphPipelineNodeConnectionTypeARM" type="enum" → 0 children
+  <enums> name="VkDataGraphPipelineNodeTypeARM" type="enum" → 0 children
+  <enums> name="VkDataGraphOpticalFlowCreateFlagBitsARM" type="bitmask" → 3 children
+  <enums> name="VkDataGraphOpticalFlowExecuteFlagBitsARM" type="bitmask" → 5 children
+  <enums> name="VkNeuralAcceleratorStatisticsModeARM" type="enum" → 3 children
+  <commands> comment="Vulkan command definitions" → 864 children
+  <feature> api="vulkan,vulkansc,vulkanbase" apitype="internal" name="VK_BASE_VERSION_1_0" number="1.0" comment="Vulkan base API interface definitions" → 26 children
+  <feature> api="vulkan,vulkansc,vulkanbase" apitype="internal" name="VK_COMPUTE_VERSION_1_0" number="1.0" depends="VK_BASE_VERSION_1_0" comment="Vulkan compute API interface definitions" → 11 children
+  <feature> api="vulkan,vulkansc,vulkanbase" apitype="internal" name="VK_GRAPHICS_VERSION_1_0" number="1.0" depends="VK_COMPUTE_VERSION_1_0" comment="Vulkan graphics API interface definitions" → 5 children
+  <feature> api="vulkan,vulkansc,vulkanbase" name="VK_VERSION_1_0" number="1.0" depends="VK_GRAPHICS_VERSION_1_0" comment="Vulkan core API interface definitions" → 1 children
+  <feature> api="vulkan,vulkansc,vulkanbase" apitype="internal" name="VK_BASE_VERSION_1_1" number="1.1" depends="VK_BASE_VERSION_1_0" comment="Vulkan base 1.1 API interface definitions." → 20 children
+  <feature> api="vulkan,vulkansc,vulkanbase" apitype="internal" name="VK_COMPUTE_VERSION_1_1" number="1.1" depends="VK_COMPUTE_VERSION_1_0,VK_BASE_VERSION_1_1" comment="Vulkan compute 1.1 API interface definitions." → 9 children
+  <feature> api="vulkan,vulkansc,vulkanbase" apitype="internal" name="VK_GRAPHICS_VERSION_1_1" number="1.1" depends="VK_GRAPHICS_VERSION_1_0,VK_COMPUTE_VERSION_1_1" comment="Vulkan graphics 1.1 API interface definitions." → 4 children
+  <feature> api="vulkan,vulkansc,vulkanbase" name="VK_VERSION_1_1" number="1.1" depends="VK_VERSION_1_0,VK_GRAPHICS_VERSION_1_1" comment="Vulkan 1.1 core API interface definitions" → 3 children
+  <feature> api="vulkan,vulkansc,vulkanbase" apitype="internal" name="VK_BASE_VERSION_1_2" number="1.2" depends="VK_BASE_VERSION_1_1" comment="Vulkan base 1.2 API interface definitions." → 8 children
+  <feature> api="vulkan,vulkansc,vulkanbase" apitype="internal" name="VK_COMPUTE_VERSION_1_2" number="1.2" depends="VK_COMPUTE_VERSION_1_1,VK_BASE_VERSION_1_2" comment="Vulkan compute 1.2 API interface definitions." → 11 children
+  <feature> api="vulkan,vulkansc,vulkanbase" apitype="internal" name="VK_GRAPHICS_VERSION_1_2" number="1.2" depends="VK_GRAPHICS_VERSION_1_1,VK_COMPUTE_VERSION_1_2" comment="Vulkan graphics 1.2 API interface definitions." → 7 children
+  <feature> api="vulkan,vulkansc,vulkanbase" name="VK_VERSION_1_2" number="1.2" depends="VK_VERSION_1_1,VK_GRAPHICS_VERSION_1_2" comment="Vulkan 1.2 core API interface definitions" → 9 children
+  <feature> api="vulkan,vulkansc,vulkanbase" apitype="internal" name="VK_BASE_VERSION_1_3" number="1.3" depends="VK_BASE_VERSION_1_2" comment="Vulkan base 1.3 API interface definitions." → 14 children
+  <feature> api="vulkan,vulkansc,vulkanbase" apitype="internal" name="VK_COMPUTE_VERSION_1_3" number="1.3" depends="VK_COMPUTE_VERSION_1_2,VK_BASE_VERSION_1_3" comment="Vulkan compute 1.3 API interface definitions." → 13 children
+  <feature> api="vulkan,vulkansc,vulkanbase" apitype="internal" name="VK_GRAPHICS_VERSION_1_3" number="1.3" depends="VK_GRAPHICS_VERSION_1_2,VK_COMPUTE_VERSION_1_3" comment="Vulkan graphics 1.3 API interface definitions." → 4 children
+  <feature> api="vulkan,vulkansc,vulkanbase" name="VK_VERSION_1_3" number="1.3" depends="VK_VERSION_1_2,VK_GRAPHICS_VERSION_1_3" comment="Vulkan 1.3 core API interface definitions" → 2 children
+  <feature> api="vulkan,vulkansc,vulkanbase" apitype="internal" name="VK_BASE_VERSION_1_4" number="1.4" depends="VK_BASE_VERSION_1_3" comment="Vulkan base 1.4 API interface definitions." → 9 children
+  <feature> api="vulkan,vulkansc,vulkanbase" apitype="internal" name="VK_COMPUTE_VERSION_1_4" number="1.4" depends="VK_COMPUTE_VERSION_1_3,VK_BASE_VERSION_1_4" comment="Vulkan compute 1.4 API interface definitions." → 10 children
+  <feature> api="vulkan,vulkansc,vulkanbase" apitype="internal" name="VK_GRAPHICS_VERSION_1_4" number="1.4" depends="VK_GRAPHICS_VERSION_1_3,VK_COMPUTE_VERSION_1_4" comment="Vulkan graphics 1.4 API interface definitions." → 6 children
+  <feature> api="vulkan,vulkansc,vulkanbase" name="VK_VERSION_1_4" number="1.4" depends="VK_VERSION_1_3,VK_GRAPHICS_VERSION_1_4" comment="Vulkan 1.4 core API interface definitions" → 2 children
+  <feature> api="vulkansc" name="VKSC_VERSION_1_0" number="1.0" depends="VK_VERSION_1_2" comment="Vulkan SC core API interface definitions" → 10 children
+  <extensions> comment="Vulkan extension interface definitions" → 692 children
+  <formats> → 297 children
+  <spirvextensions> comment="SPIR-V Extensions allowed in Vulkan and what is required to use it" → 112 children
+  <spirvcapabilities> comment="SPIR-V Capabilities allowed in Vulkan and what is required to use it" → 196 children
+  <sync> comment="Machine readable representation of the synchronization objects and their mappings" → 114 children
+  <videocodecs> → 9 children
+
+=== Element tree ===
+<registry> children=388
+  <comment> text="Copyright 2015-2026 The Khronos Group Inc.\n\nSPDX-License-Identifier: Apache-2.0 OR MIT"
+  <comment> text="This file, vk.xml, is the Vulkan API Registry. It is a critically important\nand normative part of the Vulkan Specificati..."
+  <platforms> comment="Vulkan platform names, reserved for use with platform- and window system-specific extensions" children=18
+    <platform> name="xlib" protect="VK_USE_PLATFORM_XLIB_KHR" comment="X Window System, Xlib client library"
+    <platform> name="xlib_xrandr" protect="VK_USE_PLATFORM_XLIB_XRANDR_EXT" comment="X Window System, Xlib client library, XRandR extension"
+    <platform> name="xcb" protect="VK_USE_PLATFORM_XCB_KHR" comment="X Window System, Xcb client library"
+    <platform> name="wayland" protect="VK_USE_PLATFORM_WAYLAND_KHR" comment="Wayland display server protocol"
+    <platform> name="ubm" protect="VK_USE_PLATFORM_UBM_SEC" comment="Ubm display server protocol"
+    <platform> name="directfb" protect="VK_USE_PLATFORM_DIRECTFB_EXT" comment="DirectFB library"
+    <platform> name="android" protect="VK_USE_PLATFORM_ANDROID_KHR" comment="Android OS"
+    <platform> name="win32" protect="VK_USE_PLATFORM_WIN32_KHR" comment="Microsoft Win32 API (also refers to Win64 apps)"
+    <platform> name="vi" protect="VK_USE_PLATFORM_VI_NN" comment="Nintendo Vi"
+    <platform> name="ios" protect="VK_USE_PLATFORM_IOS_MVK" comment="Apple IOS"
+    <platform> name="macos" protect="VK_USE_PLATFORM_MACOS_MVK" comment="Apple MacOS"
+    <platform> name="metal" protect="VK_USE_PLATFORM_METAL_EXT" comment="Metal on CoreAnimation on Apple platforms"
+    <platform> name="fuchsia" protect="VK_USE_PLATFORM_FUCHSIA" comment="Fuchsia"
+    <platform> name="ggp" protect="VK_USE_PLATFORM_GGP" comment="Google Games Platform"
+    <platform> name="sci" protect="VK_USE_PLATFORM_SCI" comment="NVIDIA SCI"
+    <platform> name="provisional" protect="VK_ENABLE_BETA_EXTENSIONS" comment="Enable declarations for beta/provisional extensions"
+    <platform> name="screen" protect="VK_USE_PLATFORM_SCREEN_QNX" comment="QNX Screen Graphics Subsystem"
+    <platform> name="ohos" protect="VK_USE_PLATFORM_OHOS" comment="Open Harmony OS"
+  <tags> comment="Vulkan vendor/author tags for extensions and layers" children=43
+    <tag> name="IMG" author="Imagination Technologies" contact="Andrew Garrard @fluppeteer"
+    <tag> name="AMD" author="Advanced Micro Devices, Inc." contact="Tobias Hector @tobski"
+    <tag> name="AMDX" author="Advanced Micro Devices, Inc." contact="Tobias Hector @tobski"
+    <tag> name="ARM" author="ARM Limited" contact="Jan-Harald Fredriksen @janharaldfredriksen-arm"
+    <tag> name="FSL" author="Freescale Semiconductor, Inc." contact="Norbert Nopper @FslNopper"
+    <tag> name="BRCM" author="Broadcom Corporation" contact="Graeme Leese @gnl21"
+    <tag> name="NXP" author="NXP Semiconductors N.V." contact="Norbert Nopper @FslNopper"
+    <tag> name="NV" author="NVIDIA Corporation" contact="Daniel Koch @dgkoch"
+    <tag> name="NVX" author="NVIDIA Corporation" contact="Daniel Koch @dgkoch"
+    <tag> name="VIV" author="Vivante Corporation" contact="Yanjun Zhang gitlab:@yanjunzhang"
+    <tag> name="VSI" author="VeriSilicon Holdings Co., Ltd." contact="Yanjun Zhang gitlab:@yanjunzhang"
+    <tag> name="KDAB" author="KDAB" contact="Sean Harmer @seanharmer"
+    <tag> name="ANDROID" author="Google LLC" contact="Jesse Hall @critsec"
+    <tag> name="CHROMIUM" author="Google LLC" contact="Jesse Hall @critsec"
+    <tag> name="FUCHSIA" author="Google LLC" contact="Craig Stout @cdotstout, Jesse Hall @critsec, John Rosasco @rosasco"
+    <tag> name="GGP" author="Google, LLC" contact="Jean-Francois Roy @jfroy, Hai Nguyen @chaoticbob, Jesse Hall @critsec"
+    <tag> name="GOOGLE" author="Google LLC" contact="Jesse Hall @critsec"
+    <tag> name="QCOM" author="Qualcomm Technologies, Inc." contact="Matthew Netsch @mnetsch"
+    <tag> name="LUNARG" author="LunarG, Inc." contact="Karen Ghavam @karenghavam-lunarg"
+    <tag> name="NZXT" author="NZXT Inc." contact="Jacob Kiesel @xaeroxe"
+    <tag> name="SAMSUNG" author="Samsung Electronics Co., Ltd." contact="Ralph Potter @r-potter"
+    <tag> name="SEC" author="Samsung Electronics Co., Ltd." contact="Ralph Potter @r-potter"
+    <tag> name="TIZEN" author="Samsung Electronics Co., Ltd." contact="Ralph Potter @r-potter"
+    <tag> name="RENDERDOC" author="RenderDoc (renderdoc.org)" contact="Baldur Karlsson @baldurk"
+    <tag> name="NN" author="Nintendo Co., Ltd." contact="Yasuhiro Yoshioka gitlab:@yoshioka_yasuhiro"
+    <tag> name="MVK" author="The Brenwill Workshop Ltd." contact="Bill Hollings @billhollings"
+    <tag> name="KHR" author="Khronos" contact="Ralph Potter @r-potter"
+    <tag> name="KHX" author="Khronos" contact="Ralph Potter @r-potter"
+    <tag> name="EXT" author="Multivendor" contact="Jon Leech @oddhack"
+    <tag> name="MESA" author="Mesa open source project" contact="Daniel Stone @fooishbar, David Airlie @airlied, Faith Ekstrand @gfxstrand, Hans-Kristian Arntzen @HansKristian-Work"
+    <tag> name="INTEL" author="Intel Corporation" contact="Slawek Grajewski @sgrajewski"
+    <tag> name="HUAWEI" author="Huawei Technologies Co. Ltd." contact="Pan Gao @PanGao-h, Juntao Li @Lawrenceleehw"
+    <tag> name="OHOS" author="Huawei Technologies Co. Ltd." contact="Weilan Chen @wchen-h"
+    <tag> name="VALVE" author="Valve Corporation" contact="Pierre-Loup Griffais @plagman, Joshua Ashton @Joshua-Ashton, Hans-Kristian Arntzen @HansKristian-Work"
+    <tag> name="QNX" author="BlackBerry Limited" contact="Mike Gorchak @mgorchak-blackberry, Aaron Ruby @aruby-blackberry"
+    <tag> name="JUICE" author="Juice Technologies, Inc." contact="David McCloskey @damcclos, Dean Beeler @canadacow"
+    <tag> name="FB" author="Facebook, Inc" contact="Artem Bolgar @artyom17"
+    <tag> name="RASTERGRID" author="RasterGrid Kft." contact="Daniel Rakos @aqnuep"
+    <tag> name="MSFT" author="Microsoft Corporation" contact="Jesse Natalie @jenatali"
+    <tag> name="SHADY" author="Saarland University" contact="Hugo Devillers @hugobros3"
+    ... 3 more <tags> children not listed
+  <types> comment="Vulkan type definitions" children=2676
+    <type> category="include" name="vk_platform" text="#include \"vk_platform.h\""
+    <comment> text="WSI extensions"
+    <type> category="include" name="X11/Xlib.h"
+    <type> category="include" name="X11/extensions/Xrandr.h"
+    <type> category="include" name="wayland-client.h"
+    <type> category="include" name="ubm_common.h"
+    <type> category="include" name="ubm.h"
+    <type> category="include" name="windows.h"
+    <type> category="include" name="xcb/xcb.h"
+    <type> category="include" name="directfb.h"
+    <type> category="include" name="zircon/types.h"
+    <type> category="include" name="ggp_c/vulkan_types.h"
+    <type> category="include" name="screen/screen.h"
+    <type> category="include" name="nvscisync.h"
+    <type> category="include" name="nvscibuf.h"
+    <comment> text="In the current header structure, each platform's interfaces\n                are confined to a platform-specific header (..."
+    <type> requires="X11/Xlib.h" name="Display"
+    <type> requires="X11/Xlib.h" name="VisualID"
+    <type> requires="X11/Xlib.h" name="Window"
+    <type> requires="X11/extensions/Xrandr.h" name="RROutput"
+    <type> requires="wayland-client.h" name="wl_display"
+    <type> requires="wayland-client.h" name="wl_surface"
+    <type> requires="ubm.h" name="ubm_device"
+    <type> requires="ubm.h" name="ubm_surface"
+    <type> requires="windows.h" name="HINSTANCE"
+    <type> requires="windows.h" name="HWND"
+    <type> requires="windows.h" name="HMONITOR"
+    <type> requires="windows.h" name="HANDLE"
+    <type> requires="windows.h" name="SECURITY_ATTRIBUTES"
+    <type> requires="windows.h" name="DWORD"
+    <type> requires="windows.h" name="LPCWSTR"
+    <type> requires="xcb/xcb.h" name="xcb_connection_t"
+    <type> requires="xcb/xcb.h" name="xcb_visualid_t"
+    <type> requires="xcb/xcb.h" name="xcb_window_t"
+    <type> requires="directfb.h" name="IDirectFB"
+    <type> requires="directfb.h" name="IDirectFBSurface"
+    <type> requires="zircon/types.h" name="zx_handle_t"
+    <type> requires="ggp_c/vulkan_types.h" name="GgpStreamDescriptor"
+    <type> requires="ggp_c/vulkan_types.h" name="GgpFrameToken"
+    <type> requires="screen/screen.h" name="_screen_context"
+    ... 2636 more <types> children not listed
+  <comment> text="Vulkan enumerant (token) definitions"
+  <enums> name="API Constants" type="constants" comment="Vulkan hardcoded constants - not an enumerated type, part of the header boilerplate" children=38
+    <enum> type="uint32_t" value="256" name="VK_MAX_PHYSICAL_DEVICE_NAME_SIZE"
+    <enum> type="uint32_t" value="16" name="VK_UUID_SIZE"
+    <enum> type="uint32_t" value="8" name="VK_LUID_SIZE"
+    <enum> type="uint32_t" value="256" name="VK_MAX_EXTENSION_NAME_SIZE"
+    <enum> type="uint32_t" value="256" name="VK_MAX_DESCRIPTION_SIZE"
+    <enum> type="uint32_t" value="32" name="VK_MAX_MEMORY_TYPES"
+    <enum> type="uint32_t" value="16" name="VK_MAX_MEMORY_HEAPS" comment="The maximum number of unique memory heaps, each of which supporting 1 or more memory types"
+    <enum> type="float" value="1000.0F" name="VK_LOD_CLAMP_NONE"
+    <enum> type="uint32_t" value="(~0U)" name="VK_REMAINING_MIP_LEVELS"
+    <enum> type="uint32_t" value="(~0U)" name="VK_REMAINING_ARRAY_LAYERS"
+    <enum> type="uint32_t" value="(~0U)" name="VK_REMAINING_3D_SLICES_EXT"
+    <enum> type="uint64_t" value="(~0ULL)" name="VK_WHOLE_SIZE"
+    <enum> type="uint32_t" value="(~0U)" name="VK_ATTACHMENT_UNUSED"
+    <enum> type="uint32_t" value="1" name="VK_TRUE"
+    <enum> type="uint32_t" value="0" name="VK_FALSE"
+    <enum> type="uint32_t" value="(~0U)" name="VK_QUEUE_FAMILY_IGNORED"
+    <enum> type="uint32_t" value="(~1U)" name="VK_QUEUE_FAMILY_EXTERNAL"
+    <enum> type="uint32_t" value="(~2U)" name="VK_QUEUE_FAMILY_FOREIGN_EXT"
+    <enum> type="uint32_t" value="(~0U)" name="VK_SUBPASS_EXTERNAL"
+    <enum> type="uint32_t" value="32" name="VK_MAX_DEVICE_GROUP_SIZE"
+    <enum> type="uint32_t" value="256" name="VK_MAX_DRIVER_NAME_SIZE"
+    <enum> type="uint32_t" value="256" name="VK_MAX_DRIVER_INFO_SIZE"
+    <enum> type="uint32_t" value="(~0U)" name="VK_SHADER_UNUSED_KHR"
+    <enum> type="uint32_t" value="16" name="VK_MAX_GLOBAL_PRIORITY_SIZE"
+    <enum> type="uint32_t" value="32" name="VK_MAX_SHADER_MODULE_IDENTIFIER_SIZE_EXT"
+    <enum> type="uint32_t" value="32" name="VK_MAX_PIPELINE_BINARY_KEY_SIZE_KHR"
+    <enum> type="uint32_t" value="7" name="VK_MAX_VIDEO_AV1_REFERENCES_PER_FRAME_KHR"
+    <enum> type="uint32_t" value="3" name="VK_MAX_VIDEO_VP9_REFERENCES_PER_FRAME_KHR"
+    <enum> type="uint32_t" value="(~0U)" name="VK_SHADER_INDEX_UNUSED_AMDX"
+    <enum> type="uint32_t" value="(~0U)" name="VK_PARTITIONED_ACCELERATION_STRUCTURE_PARTITION_INDEX_GLOBAL_NV"
+    <enum> type="uint32_t" value="128" name="VK_COMPRESSED_TRIANGLE_FORMAT_DGF1_BYTE_ALIGNMENT_AMDX"
+    <enum> type="uint32_t" value="128" name="VK_COMPRESSED_TRIANGLE_FORMAT_DGF1_BYTE_STRIDE_AMDX"
+    <enum> type="uint32_t" value="128" name="VK_MAX_PHYSICAL_DEVICE_DATA_GRAPH_OPERATION_SET_NAME_SIZE_ARM"
+    <enum> type="uint32_t" value="3" name="VK_DATA_GRAPH_MODEL_TOOLCHAIN_VERSION_LENGTH_QCOM"
+    <enum> type="float" value="0.25f" name="VK_COMPUTE_OCCUPANCY_PRIORITY_LOW_NV"
+    <enum> type="float" value="0.50f" name="VK_COMPUTE_OCCUPANCY_PRIORITY_NORMAL_NV"
+    <enum> type="float" value="0.75f" name="VK_COMPUTE_OCCUPANCY_PRIORITY_HIGH_NV"
+    <enum> type="uint32_t" value="128" name="VK_MAX_DATA_GRAPH_TOSA_NAME_SIZE_ARM"
+  <comment> text="Unlike OpenGL, most tokens in Vulkan are actual typed enumerants in\n        their own numeric namespaces. The \"name\" att..."
+  <enums> name="VkImageLayout" type="enum" children=9
+    <enum> value="0" name="VK_IMAGE_LAYOUT_UNDEFINED" comment="Implicit layout an image is when its contents are undefined due to various reasons (e.g. right after creation)"
+    <enum> value="1" name="VK_IMAGE_LAYOUT_GENERAL" comment="General layout when image can be used for any kind of access"
+    <enum> value="2" name="VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL" comment="Optimal layout when image is only used for color attachment read/write"
+    <enum> value="3" name="VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL" comment="Optimal layout when image is only used for depth/stencil attachment read/write"
+    <enum> value="4" name="VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL" comment="Optimal layout when image is used for read only depth/stencil attachment and shader access"
+    <enum> value="5" name="VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL" comment="Optimal layout when image is used for read only shader access"
+    <enum> value="6" name="VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL" comment="Optimal layout when image is used only as source of transfer operations"
+    <enum> value="7" name="VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL" comment="Optimal layout when image is used only as destination of transfer operations"
+    <enum> value="8" name="VK_IMAGE_LAYOUT_PREINITIALIZED" comment="Initial layout used when the data is populated by the CPU"
+  <enums> name="VkAttachmentLoadOp" type="enum" children=3
+    <enum> value="0" name="VK_ATTACHMENT_LOAD_OP_LOAD"
+    <enum> value="1" name="VK_ATTACHMENT_LOAD_OP_CLEAR"
+    <enum> value="2" name="VK_ATTACHMENT_LOAD_OP_DONT_CARE"
+  <enums> name="VkAttachmentStoreOp" type="enum" children=2
+    <enum> value="0" name="VK_ATTACHMENT_STORE_OP_STORE"
+    <enum> value="1" name="VK_ATTACHMENT_STORE_OP_DONT_CARE"
+  <enums> name="VkImageType" type="enum" children=3
+    <enum> value="0" name="VK_IMAGE_TYPE_1D"
+    <enum> value="1" name="VK_IMAGE_TYPE_2D"
+    <enum> value="2" name="VK_IMAGE_TYPE_3D"
+  <enums> name="VkImageTiling" type="enum" children=2
+    <enum> value="0" name="VK_IMAGE_TILING_OPTIMAL"
+    <enum> value="1" name="VK_IMAGE_TILING_LINEAR"
+  <enums> name="VkImageViewType" type="enum" children=7
+    <enum> value="0" name="VK_IMAGE_VIEW_TYPE_1D"
+    <enum> value="1" name="VK_IMAGE_VIEW_TYPE_2D"
+    <enum> value="2" name="VK_IMAGE_VIEW_TYPE_3D"
+    <enum> value="3" name="VK_IMAGE_VIEW_TYPE_CUBE"
+    <enum> value="4" name="VK_IMAGE_VIEW_TYPE_1D_ARRAY"
+    <enum> value="5" name="VK_IMAGE_VIEW_TYPE_2D_ARRAY"
+    <enum> value="6" name="VK_IMAGE_VIEW_TYPE_CUBE_ARRAY"
+  <enums> name="VkCommandBufferLevel" type="enum" children=2
+    <enum> value="0" name="VK_COMMAND_BUFFER_LEVEL_PRIMARY"
+    <enum> value="1" name="VK_COMMAND_BUFFER_LEVEL_SECONDARY"
+  <enums> name="VkComponentSwizzle" type="enum" children=7
+    <enum> value="0" name="VK_COMPONENT_SWIZZLE_IDENTITY"
+    <enum> value="1" name="VK_COMPONENT_SWIZZLE_ZERO"
+    <enum> value="2" name="VK_COMPONENT_SWIZZLE_ONE"
+    <enum> value="3" name="VK_COMPONENT_SWIZZLE_R"
+    <enum> value="4" name="VK_COMPONENT_SWIZZLE_G"
+    <enum> value="5" name="VK_COMPONENT_SWIZZLE_B"
+    <enum> value="6" name="VK_COMPONENT_SWIZZLE_A"
+  <enums> name="VkDescriptorType" type="enum" children=11
+    <enum> value="0" name="VK_DESCRIPTOR_TYPE_SAMPLER"
+    <enum> value="1" name="VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER"
+    <enum> value="2" name="VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE"
+    <enum> value="3" name="VK_DESCRIPTOR_TYPE_STORAGE_IMAGE"
+    <enum> value="4" name="VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER"
+    <enum> value="5" name="VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER"
+    <enum> value="6" name="VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER"
+    <enum> value="7" name="VK_DESCRIPTOR_TYPE_STORAGE_BUFFER"
+    <enum> value="8" name="VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC"
+    <enum> value="9" name="VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC"
+    <enum> value="10" name="VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT"
+  <enums> name="VkQueryType" type="enum" children=3
+    <enum> value="0" name="VK_QUERY_TYPE_OCCLUSION"
+    <enum> value="1" name="VK_QUERY_TYPE_PIPELINE_STATISTICS" comment="Optional"
+    <enum> value="2" name="VK_QUERY_TYPE_TIMESTAMP"
+  <enums> name="VkBorderColor" type="enum" children=6
+    <enum> value="0" name="VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK"
+    <enum> value="1" name="VK_BORDER_COLOR_INT_TRANSPARENT_BLACK"
+    <enum> value="2" name="VK_BORDER_COLOR_FLOAT_OPAQUE_BLACK"
+    <enum> value="3" name="VK_BORDER_COLOR_INT_OPAQUE_BLACK"
+    <enum> value="4" name="VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE"
+    <enum> value="5" name="VK_BORDER_COLOR_INT_OPAQUE_WHITE"
+  <enums> name="VkPipelineBindPoint" type="enum" children=2
+    <enum> value="0" name="VK_PIPELINE_BIND_POINT_GRAPHICS"
+    <enum> value="1" name="VK_PIPELINE_BIND_POINT_COMPUTE"
+  <enums> name="VkPipelineCacheHeaderVersion" type="enum" children=1
+    <enum> value="1" name="VK_PIPELINE_CACHE_HEADER_VERSION_ONE"
+  <enums> name="VkPipelineCacheCreateFlagBits" type="bitmask"
+  <enums> name="VkPrimitiveTopology" type="enum" children=11
+    <enum> value="0" name="VK_PRIMITIVE_TOPOLOGY_POINT_LIST"
+    <enum> value="1" name="VK_PRIMITIVE_TOPOLOGY_LINE_LIST"
+    <enum> value="2" name="VK_PRIMITIVE_TOPOLOGY_LINE_STRIP"
+    <enum> value="3" name="VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST"
+    <enum> value="4" name="VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP"
+    <enum> value="5" name="VK_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN"
+    <enum> value="6" name="VK_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY"
+    <enum> value="7" name="VK_PRIMITIVE_TOPOLOGY_LINE_STRIP_WITH_ADJACENCY"
+    <enum> value="8" name="VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST_WITH_ADJACENCY"
+    <enum> value="9" name="VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP_WITH_ADJACENCY"
+    <enum> value="10" name="VK_PRIMITIVE_TOPOLOGY_PATCH_LIST"
+  <enums> name="VkSharingMode" type="enum" children=2
+    <enum> value="0" name="VK_SHARING_MODE_EXCLUSIVE"
+    <enum> value="1" name="VK_SHARING_MODE_CONCURRENT"
+  <enums> name="VkIndexType" type="enum" children=2
+    <enum> value="0" name="VK_INDEX_TYPE_UINT16"
+    <enum> value="1" name="VK_INDEX_TYPE_UINT32"
+  <enums> name="VkFilter" type="enum" children=2
+    <enum> value="0" name="VK_FILTER_NEAREST"
+    <enum> value="1" name="VK_FILTER_LINEAR"
+  <enums> name="VkSamplerMipmapMode" type="enum" children=2
+    <enum> value="0" name="VK_SAMPLER_MIPMAP_MODE_NEAREST" comment="Choose nearest mip level"
+    <enum> value="1" name="VK_SAMPLER_MIPMAP_MODE_LINEAR" comment="Linear filter between mip levels"
+  <enums> name="VkSamplerAddressMode" type="enum" children=5
+    <enum> value="0" name="VK_SAMPLER_ADDRESS_MODE_REPEAT"
+    <enum> value="1" name="VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT"
+    <enum> value="2" name="VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE"
+    <enum> value="3" name="VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER"
+    <comment> text="value=\"4\" reserved for VK_KHR_sampler_mirror_clamp_to_edge\n                enum VK_SAMPLER_ADDRESS_MODE_MIRROR_CLAMP_TO_..."
+  <enums> name="VkCompareOp" type="enum" children=8
+    <enum> value="0" name="VK_COMPARE_OP_NEVER"
+    <enum> value="1" name="VK_COMPARE_OP_LESS"
+    <enum> value="2" name="VK_COMPARE_OP_EQUAL"
+    <enum> value="3" name="VK_COMPARE_OP_LESS_OR_EQUAL"
+    <enum> value="4" name="VK_COMPARE_OP_GREATER"
+    <enum> value="5" name="VK_COMPARE_OP_NOT_EQUAL"
+    <enum> value="6" name="VK_COMPARE_OP_GREATER_OR_EQUAL"
+    <enum> value="7" name="VK_COMPARE_OP_ALWAYS"
+  <enums> name="VkPolygonMode" type="enum" children=3
+    <enum> value="0" name="VK_POLYGON_MODE_FILL"
+    <enum> value="1" name="VK_POLYGON_MODE_LINE"
+    <enum> value="2" name="VK_POLYGON_MODE_POINT"
+  <enums> name="VkFrontFace" type="enum" children=2
+    <enum> value="0" name="VK_FRONT_FACE_COUNTER_CLOCKWISE"
+    <enum> value="1" name="VK_FRONT_FACE_CLOCKWISE"
+  <enums> name="VkBlendFactor" type="enum" children=19
+    <enum> value="0" name="VK_BLEND_FACTOR_ZERO"
+    <enum> value="1" name="VK_BLEND_FACTOR_ONE"
+    <enum> value="2" name="VK_BLEND_FACTOR_SRC_COLOR"
+    <enum> value="3" name="VK_BLEND_FACTOR_ONE_MINUS_SRC_COLOR"
+    <enum> value="4" name="VK_BLEND_FACTOR_DST_COLOR"
+    <enum> value="5" name="VK_BLEND_FACTOR_ONE_MINUS_DST_COLOR"
+    <enum> value="6" name="VK_BLEND_FACTOR_SRC_ALPHA"
+    <enum> value="7" name="VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA"
+    <enum> value="8" name="VK_BLEND_FACTOR_DST_ALPHA"
+    <enum> value="9" name="VK_BLEND_FACTOR_ONE_MINUS_DST_ALPHA"
+    <enum> value="10" name="VK_BLEND_FACTOR_CONSTANT_COLOR"
+    <enum> value="11" name="VK_BLEND_FACTOR_ONE_MINUS_CONSTANT_COLOR"
+    <enum> value="12" name="VK_BLEND_FACTOR_CONSTANT_ALPHA"
+    <enum> value="13" name="VK_BLEND_FACTOR_ONE_MINUS_CONSTANT_ALPHA"
+    <enum> value="14" name="VK_BLEND_FACTOR_SRC_ALPHA_SATURATE"
+    <enum> value="15" name="VK_BLEND_FACTOR_SRC1_COLOR"
+    <enum> value="16" name="VK_BLEND_FACTOR_ONE_MINUS_SRC1_COLOR"
+    <enum> value="17" name="VK_BLEND_FACTOR_SRC1_ALPHA"
+    <enum> value="18" name="VK_BLEND_FACTOR_ONE_MINUS_SRC1_ALPHA"
+  <enums> name="VkBlendOp" type="enum" children=5
+    <enum> value="0" name="VK_BLEND_OP_ADD"
+    <enum> value="1" name="VK_BLEND_OP_SUBTRACT"
+    <enum> value="2" name="VK_BLEND_OP_REVERSE_SUBTRACT"
+    <enum> value="3" name="VK_BLEND_OP_MIN"
+    <enum> value="4" name="VK_BLEND_OP_MAX"
+  <enums> name="VkStencilOp" type="enum" children=8
+    <enum> value="0" name="VK_STENCIL_OP_KEEP"
+    <enum> value="1" name="VK_STENCIL_OP_ZERO"
+    <enum> value="2" name="VK_STENCIL_OP_REPLACE"
+    <enum> value="3" name="VK_STENCIL_OP_INCREMENT_AND_CLAMP"
+    <enum> value="4" name="VK_STENCIL_OP_DECREMENT_AND_CLAMP"
+    <enum> value="5" name="VK_STENCIL_OP_INVERT"
+    <enum> value="6" name="VK_STENCIL_OP_INCREMENT_AND_WRAP"
+    <enum> value="7" name="VK_STENCIL_OP_DECREMENT_AND_WRAP"
+  <enums> name="VkLogicOp" type="enum" children=16
+    <enum> value="0" name="VK_LOGIC_OP_CLEAR"
+    <enum> value="1" name="VK_LOGIC_OP_AND"
+    <enum> value="2" name="VK_LOGIC_OP_AND_REVERSE"
+    <enum> value="3" name="VK_LOGIC_OP_COPY"
+    <enum> value="4" name="VK_LOGIC_OP_AND_INVERTED"
+    <enum> value="5" name="VK_LOGIC_OP_NO_OP"
+    <enum> value="6" name="VK_LOGIC_OP_XOR"
+    <enum> value="7" name="VK_LOGIC_OP_OR"
+    <enum> value="8" name="VK_LOGIC_OP_NOR"
+    <enum> value="9" name="VK_LOGIC_OP_EQUIVALENT"
+    <enum> value="10" name="VK_LOGIC_OP_INVERT"
+    <enum> value="11" name="VK_LOGIC_OP_OR_REVERSE"
+    <enum> value="12" name="VK_LOGIC_OP_COPY_INVERTED"
+    <enum> value="13" name="VK_LOGIC_OP_OR_INVERTED"
+    <enum> value="14" name="VK_LOGIC_OP_NAND"
+    <enum> value="15" name="VK_LOGIC_OP_SET"
+  <enums> name="VkInternalAllocationType" type="enum" children=1
+    <enum> value="0" name="VK_INTERNAL_ALLOCATION_TYPE_EXECUTABLE"
+  <enums> name="VkSystemAllocationScope" type="enum" children=5
+    <enum> value="0" name="VK_SYSTEM_ALLOCATION_SCOPE_COMMAND"
+    <enum> value="1" name="VK_SYSTEM_ALLOCATION_SCOPE_OBJECT"
+    <enum> value="2" name="VK_SYSTEM_ALLOCATION_SCOPE_CACHE"
+    <enum> value="3" name="VK_SYSTEM_ALLOCATION_SCOPE_DEVICE"
+    <enum> value="4" name="VK_SYSTEM_ALLOCATION_SCOPE_INSTANCE"
+  <enums> name="VkPhysicalDeviceType" type="enum" children=5
+    <enum> value="0" name="VK_PHYSICAL_DEVICE_TYPE_OTHER"
+    <enum> value="1" name="VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU"
+    <enum> value="2" name="VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU"
+    <enum> value="3" name="VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU"
+    <enum> value="4" name="VK_PHYSICAL_DEVICE_TYPE_CPU"
+  <enums> name="VkVertexInputRate" type="enum" children=2
+    <enum> value="0" name="VK_VERTEX_INPUT_RATE_VERTEX"
+    <enum> value="1" name="VK_VERTEX_INPUT_RATE_INSTANCE"
+  <enums> name="VkFormat" type="enum" comment="Vulkan format definitions" children=185
+    <enum> value="0" name="VK_FORMAT_UNDEFINED"
+    <enum> value="1" name="VK_FORMAT_R4G4_UNORM_PACK8"
+    <enum> value="2" name="VK_FORMAT_R4G4B4A4_UNORM_PACK16"
+    <enum> value="3" name="VK_FORMAT_B4G4R4A4_UNORM_PACK16"
+    <enum> value="4" name="VK_FORMAT_R5G6B5_UNORM_PACK16"
+    <enum> value="5" name="VK_FORMAT_B5G6R5_UNORM_PACK16"
+    <enum> value="6" name="VK_FORMAT_R5G5B5A1_UNORM_PACK16"
+    <enum> value="7" name="VK_FORMAT_B5G5R5A1_UNORM_PACK16"
+    <enum> value="8" name="VK_FORMAT_A1R5G5B5_UNORM_PACK16"
+    <enum> value="9" name="VK_FORMAT_R8_UNORM"
+    <enum> value="10" name="VK_FORMAT_R8_SNORM"
+    <enum> value="11" name="VK_FORMAT_R8_USCALED"
+    <enum> value="12" name="VK_FORMAT_R8_SSCALED"
+    <enum> value="13" name="VK_FORMAT_R8_UINT"
+    <enum> value="14" name="VK_FORMAT_R8_SINT"
+    <enum> value="15" name="VK_FORMAT_R8_SRGB"
+    <enum> value="16" name="VK_FORMAT_R8G8_UNORM"
+    <enum> value="17" name="VK_FORMAT_R8G8_SNORM"
+    <enum> value="18" name="VK_FORMAT_R8G8_USCALED"
+    <enum> value="19" name="VK_FORMAT_R8G8_SSCALED"
+    <enum> value="20" name="VK_FORMAT_R8G8_UINT"
+    <enum> value="21" name="VK_FORMAT_R8G8_SINT"
+    <enum> value="22" name="VK_FORMAT_R8G8_SRGB"
+    <enum> value="23" name="VK_FORMAT_R8G8B8_UNORM"
+    <enum> value="24" name="VK_FORMAT_R8G8B8_SNORM"
+    <enum> value="25" name="VK_FORMAT_R8G8B8_USCALED"
+    <enum> value="26" name="VK_FORMAT_R8G8B8_SSCALED"
+    <enum> value="27" name="VK_FORMAT_R8G8B8_UINT"
+    <enum> value="28" name="VK_FORMAT_R8G8B8_SINT"
+    <enum> value="29" name="VK_FORMAT_R8G8B8_SRGB"
+    <enum> value="30" name="VK_FORMAT_B8G8R8_UNORM"
+    <enum> value="31" name="VK_FORMAT_B8G8R8_SNORM"
+    <enum> value="32" name="VK_FORMAT_B8G8R8_USCALED"
+    <enum> value="33" name="VK_FORMAT_B8G8R8_SSCALED"
+    <enum> value="34" name="VK_FORMAT_B8G8R8_UINT"
+    <enum> value="35" name="VK_FORMAT_B8G8R8_SINT"
+    <enum> value="36" name="VK_FORMAT_B8G8R8_SRGB"
+    <enum> value="37" name="VK_FORMAT_R8G8B8A8_UNORM"
+    <enum> value="38" name="VK_FORMAT_R8G8B8A8_SNORM"
+    <enum> value="39" name="VK_FORMAT_R8G8B8A8_USCALED"
+    ... 145 more <enums> children not listed
+  ... 348 more <registry> children not listed
+
