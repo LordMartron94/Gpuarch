@@ -18,6 +18,7 @@ func vulkanSpecIRBuild(root *xmlSpecNode) VulkanSpecIR {
 	enums := vulkanSpecIREnumsCollect(root)
 	flags := vulkanSpecIRFlagsCollect(root, bitmaskRegistry)
 	flags = vulkanSpecIRExtensionEnumsApply(root, &enums, flags)
+	handles := vulkanSpecIRHandlesCollect(root)
 
 	sort.Slice(basetypes, func(i, j int) bool { return basetypes[i].Name < basetypes[j].Name })
 	sort.Slice(enums, func(i, j int) bool { return enums[i].Name < enums[j].Name })
@@ -30,5 +31,6 @@ func vulkanSpecIRBuild(root *xmlSpecNode) VulkanSpecIR {
 		Constants: constants,
 		Enums:     enums,
 		Flags:     flags,
+		Handles:   handles,
 	}
 }

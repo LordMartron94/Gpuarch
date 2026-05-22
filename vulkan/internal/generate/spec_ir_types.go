@@ -10,6 +10,7 @@ type VulkanSpecIR struct {
 	Constants VulkanSpecIRConstants
 	Enums     []VulkanSpecIREnum
 	Flags     []VulkanSpecIRFlags
+	Handles   []VulkanSpecIRHandle
 }
 
 /*
@@ -32,6 +33,22 @@ type VulkanSpecIRConstantValue struct {
 	Value  string
 	GoType string
 	Doc    string
+}
+
+/*
+VulkanSpecIRHandle is one Vulkan handle from <type category="handle">.
+
+Dispatchable handles map to uintptr; non-dispatchable handles map to uint64. AliasOf is set for
+registry type aliases that share the same underlying handle representation.
+*/
+type VulkanSpecIRHandle struct {
+	Name           string
+	Underlying     string
+	Dispatchable   bool
+	Parent         string
+	ObjectTypeEnum string
+	AliasOf        string
+	Doc            string
 }
 
 /*

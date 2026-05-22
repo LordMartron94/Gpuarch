@@ -13,6 +13,7 @@ const (
 	constantsBindingFile        = "bindings_constants_gen.go"
 	enumBindingFile             = "bindings_enums_gen.go"
 	flagsBindingFile            = "bindings_flags_gen.go"
+	handlesBindingFile          = "bindings_handles_gen.go"
 	vulkanBindingsGeneratorTool = "gpuarch Vulkan bindings generator"
 	vulkanEnumBaseTypeName      = "VkEnum"
 )
@@ -30,7 +31,45 @@ func specToBindingsConvert(ir VulkanSpecIR, bindingsDir string) error {
 	if err := generateFlagsContent(ir.Flags, bindingsDir); err != nil {
 		return err
 	}
+	if err := generateHandlesContent(ir.Handles, bindingsDir); err != nil {
+		return err
+	}
 	return nil
+}
+
+func generateHandlesContent(handles []VulkanSpecIRHandle, bindingsDir string) error {
+	if len(handles) == 0 {
+		return nil
+	}
+
+	elements := bindingFilePreamble()
+	for _, handle := range handles {
+		elements = append(elements, vulkanSpecIRHandleBindingElements(handle)...)
+	}
+	return writeBindingFile(bindingsDir, handlesBindingFile, elements)
+}
+
+func vulkanSpecIRHandleBindingElements(handle VulkanSpecIRHandle) []codegen.FileElement {
+	if handle.Name == "" || handle.Underlying == "" {
+		return nil
+	}
+
+	underlying := gocode.TypeExprNamed(handle.Underlying)
+	if handle.AliasOf != "" {
+		underlying = gocode.TypeExprNamed(handle.AliasOf)
+	}
+
+	elements := make([]codegen.FileElement, 0, 2)
+	elements = append(elements, gocode.FileElementFrom(
+		gocode.DeclTypeDefined(
+			handle.Name,
+			underlying,
+			handle.AliasOf != "",
+			gocode.GoDocFormatExported(handle.Name, handle.Doc),
+		),
+	))
+	blankLine(&elements)
+	return elements
 }
 
 func writeBindingFile(bindingsDir string, fileName string, elements []codegen.FileElement) error {
