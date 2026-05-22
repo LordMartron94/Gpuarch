@@ -250,6 +250,31 @@ func vulkanSpecIRDocFormatValidUsageRuleNormalize(rule string) string {
 const vulkanSpecIRDocGeneratedLead = "is generated from the Khronos Vulkan registry."
 
 /*
+vulkanLoaderDocFormatHolderField formats GoDoc on a loader command holder field.
+
+The comment is anchored on the holder field name (for example CreateInstance) while composedDoc
+carries Khronos man page prose keyed by the Vulkan entry point name (for example vkCreateInstance).
+*/
+func vulkanLoaderDocFormatHolderField(goFieldName string, vkCommandName string, composedDoc string) string {
+	goFieldName = strings.TrimSpace(goFieldName)
+	vkCommandName = strings.TrimSpace(vkCommandName)
+	composedDoc = strings.TrimSpace(composedDoc)
+
+	if goFieldName == "" {
+		return composedDoc
+	}
+
+	prefix := goFieldName + " resolves " + vkCommandName + " on the loaded Vulkan ICD."
+	if vkCommandName == "" {
+		prefix = goFieldName + " is a loaded Vulkan command on the command holder."
+	}
+	if composedDoc == "" {
+		return prefix
+	}
+	return prefix + "\n\n" + composedDoc
+}
+
+/*
 vulkanSpecIRDocFormatExported formats documentation for generated Vulkan bindings.
 
 The first sentence names the symbol and states the registry source so linters accept the GoDoc comment. Section tags such as [Context] and [Reference] follow in later paragraphs.

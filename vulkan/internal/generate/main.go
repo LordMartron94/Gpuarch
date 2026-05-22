@@ -7,6 +7,14 @@ import (
 	"path/filepath"
 )
 
+func bindingOutputAbsPath(bindingOutputDir string) string {
+	bindingOutputAbs, err := filepath.Abs(bindingOutputDir)
+	if err != nil {
+		panic(fmt.Errorf("resolve binding output path: %w", err))
+	}
+	return bindingOutputAbs
+}
+
 const specName string = "vulkan_spec.xml"
 const specDebug string = "vulkan_spec_debug.txt"
 
@@ -55,10 +63,7 @@ func runSpecFetch(specOutputDir string) {
 }
 
 func runBindingGeneration(specOutputDir string, bindingOutputDir string, refpageDir string, refpageSkipFetch bool, refpageUpdate bool) {
-	bindingOutputAbs, err := filepath.Abs(bindingOutputDir)
-	if err != nil {
-		panic(fmt.Errorf("resolve binding output path: %w", err))
-	}
+	bindingOutputAbs := bindingOutputAbsPath(bindingOutputDir)
 	system.DirCreate(bindingOutputAbs, true)
 
 	root, loadedExisting, err := vulkanRegistrySpecEnsure(specOutputDir)
@@ -98,6 +103,13 @@ func runBindingGeneration(specOutputDir string, bindingOutputDir string, refpage
 		panic(err)
 	}
 
+	loaderOutputDir := system.PathJoin(system.PathDir(bindingOutputAbs), "loader")
+	system.DirCreate(loaderOutputDir, true)
+	if err := specToLoaderConvert(ir, loaderOutputDir, corpus); err != nil {
+		panic(err)
+	}
+
 	fmt.Printf("Wrote Vulkan bindings to %s\n", bindingOutputDir)
-	fmt.Printf("Formatted Vulkan bindings with gofmt\n")
+	fmt.Printf("Wrote Vulkan loader to %s\n", loaderOutputDir)
+	fmt.Printf("Formatted Vulkan bindings and loader with gofmt\n")
 }

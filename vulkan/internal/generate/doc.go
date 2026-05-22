@@ -9,6 +9,9 @@ Binding generation uses three documentation tiers:
     types include [Description], [Valid Usage], and [Valid Usage (Implicit)]; struct fields include member-level
     valid usage when the refpage attributes rules to a member.
   - Commands: bindings_commands_gen.go exposes PFN_vk* function types for every Vulkan command in vk.xml.
+  - Loader: ../loader/loader_commands_gen.go exposes VulkanGlobalCommands, VulkanInstanceCommands, and
+    VulkanDeviceCommands holders (with Khronos man page docs on each field) plus Vulkan*CommandsLoad functions.
+    Platform ICD loading is in vulkan_module_{linux,windows,darwin}.go.
   - Registry metadata: bindings_registry_gen.go exposes VkRegistryExtension, VkRegistryApiVersion, and
     VkRegistryFeature tables parsed from vk.xml for extension enable strings and capability negotiation.
 

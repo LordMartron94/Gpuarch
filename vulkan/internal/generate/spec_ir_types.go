@@ -157,6 +157,17 @@ type VulkanSpecIRFuncpointer struct {
 }
 
 /*
+VulkanSpecIRCommandLoaderTier identifies which proc addr loader resolves a command.
+*/
+type VulkanSpecIRCommandLoaderTier string
+
+const (
+	VulkanCommandLoaderTierGlobal   VulkanSpecIRCommandLoaderTier = "global"
+	VulkanCommandLoaderTierInstance VulkanSpecIRCommandLoaderTier = "instance"
+	VulkanCommandLoaderTierDevice   VulkanSpecIRCommandLoaderTier = "device"
+)
+
+/*
 VulkanSpecIRCommand is one Vulkan command from <commands> in vk.xml.
 
 PFNTypeName is the loader typedef name (for example PFN_vkCreateInstance). AliasOf is set for
@@ -170,6 +181,8 @@ type VulkanSpecIRCommand struct {
 	Params        []VulkanSpecIRFuncpointerParam
 	AliasOf       string
 	AliasOfName   string
+	LoaderTier    VulkanSpecIRCommandLoaderTier
+	GoFieldName   string
 	XMLDoc        string
 	APIPriority   int
 }

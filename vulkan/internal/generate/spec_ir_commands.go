@@ -3,6 +3,7 @@ package main
 import (
 	"sort"
 	"strings"
+	"unicode"
 )
 
 func vulkanSpecIRCommandsCollect(root *xmlSpecNode, registry VulkanSpecIRTypeRegistry) []VulkanSpecIRCommand {
@@ -15,6 +16,7 @@ func vulkanSpecIRCommandsCollect(root *xmlSpecNode, registry VulkanSpecIRTypeReg
 
 	vulkanSpecIRCommandsCollectWalk(root, registry, byName, &aliasOnly)
 	vulkanSpecIRCommandsApplyAliases(byName, aliasOnly)
+	vulkanSpecIRCommandsFinalizeTiers(byName, aliasOnly)
 
 	commands := make([]VulkanSpecIRCommand, 0, len(byName)+len(aliasOnly))
 	for _, command := range byName {
@@ -68,6 +70,7 @@ func vulkanSpecIRCommandCollect(
 			PFNTypeName: vulkanSpecIRCommandPFNTypeName(name),
 			AliasOf:     vulkanSpecIRCommandPFNTypeName(aliasName),
 			AliasOfName: aliasName,
+			GoFieldName: vulkanSpecIRCommandGoFieldName(name),
 			XMLDoc:      xmlSpecNodeDirectCommentsCollect(cmdNode),
 		})
 		return
@@ -84,6 +87,8 @@ func vulkanSpecIRCommandCollect(
 		ReturnGoType:  returnGoType,
 		ReturnsUnsafe: returnsUnsafe,
 		Params:        params,
+		LoaderTier:    vulkanSpecIRCommandLoaderTierInfer(name, params),
+		GoFieldName:   vulkanSpecIRCommandGoFieldName(name),
 		XMLDoc:        xmlSpecNodeDirectCommentsCollect(cmdNode),
 		APIPriority:   vulkanSpecIRCommandPriority(cmdNode),
 	}
@@ -111,6 +116,60 @@ func vulkanSpecIRCommandsApplyAliases(
 
 func vulkanSpecIRCommandPFNTypeName(vkName string) string {
 	return "PFN_" + vkName
+}
+
+func vulkanSpecIRCommandGoFieldName(vkName string) string {
+	name := strings.TrimPrefix(vkName, "vk")
+	if name == "" {
+		return vkName
+	}
+	runes := []rune(name)
+	runes[0] = unicode.ToUpper(runes[0])
+	return string(runes)
+}
+
+func vulkanSpecIRCommandsFinalizeTiers(
+	byName map[string]VulkanSpecIRCommand,
+	aliasOnly []VulkanSpecIRCommand,
+) {
+	for i := range aliasOnly {
+		if aliasOnly[i].LoaderTier != "" {
+			continue
+		}
+		if target, ok := byName[aliasOnly[i].AliasOfName]; ok {
+			aliasOnly[i].LoaderTier = target.LoaderTier
+		} else {
+			aliasOnly[i].LoaderTier = VulkanCommandLoaderTierInstance
+		}
+	}
+}
+
+func vulkanSpecIRCommandLoaderTierInfer(name string, params []VulkanSpecIRFuncpointerParam) VulkanSpecIRCommandLoaderTier {
+	switch name {
+	case "vkCreateInstance",
+		"vkEnumerateInstanceExtensionProperties",
+		"vkEnumerateInstanceLayerProperties",
+		"vkEnumerateInstanceVersion",
+		"vkGetInstanceProcAddr":
+		return VulkanCommandLoaderTierGlobal
+	}
+
+	for _, param := range params {
+		base := strings.TrimPrefix(param.GoType, "*")
+		base = strings.TrimPrefix(base, "[]")
+		switch base {
+		case "VkDevice":
+			return VulkanCommandLoaderTierDevice
+		case "VkCommandBuffer", "VkQueue":
+			return VulkanCommandLoaderTierDevice
+		case "VkInstance":
+			return VulkanCommandLoaderTierInstance
+		case "VkPhysicalDevice":
+			return VulkanCommandLoaderTierInstance
+		}
+	}
+
+	return VulkanCommandLoaderTierInstance
 }
 
 func vulkanSpecIRCommandHasProto(cmdNode *xmlSpecNode) bool {
