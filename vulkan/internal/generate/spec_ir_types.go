@@ -11,6 +11,7 @@ type VulkanSpecIR struct {
 	Enums        []VulkanSpecIREnum
 	Flags        []VulkanSpecIRFlags
 	Funcpointers []VulkanSpecIRFuncpointer
+	Commands     []VulkanSpecIRCommand
 	Handles      []VulkanSpecIRHandle
 	Structs      []VulkanSpecIRStruct
 	ApiVersions  []VulkanSpecIRApiVersion
@@ -153,4 +154,22 @@ type VulkanSpecIRFuncpointer struct {
 	ReturnsUnsafe bool
 	Params        []VulkanSpecIRFuncpointerParam
 	XMLDoc        string
+}
+
+/*
+VulkanSpecIRCommand is one Vulkan command from <commands> in vk.xml.
+
+PFNTypeName is the loader typedef name (for example PFN_vkCreateInstance). AliasOf is set for
+registry command aliases that share another command's signature.
+*/
+type VulkanSpecIRCommand struct {
+	Name          string
+	PFNTypeName   string
+	ReturnGoType  string
+	ReturnsUnsafe bool
+	Params        []VulkanSpecIRFuncpointerParam
+	AliasOf       string
+	AliasOfName   string
+	XMLDoc        string
+	APIPriority   int
 }

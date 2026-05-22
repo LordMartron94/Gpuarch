@@ -8,6 +8,7 @@ Binding generation uses three documentation tiers:
   - Tier 3: cached Khronos man page HTML under -refpageDir (default <specOutputDir>/refpages). Struct and union
     types include [Description], [Valid Usage], and [Valid Usage (Implicit)]; struct fields include member-level
     valid usage when the refpage attributes rules to a member.
+  - Commands: bindings_commands_gen.go exposes PFN_vk* function types for every Vulkan command in vk.xml.
   - Registry metadata: bindings_registry_gen.go exposes VkRegistryExtension, VkRegistryApiVersion, and
     VkRegistryFeature tables parsed from vk.xml for extension enable strings and capability negotiation.
 

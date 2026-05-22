@@ -73,6 +73,10 @@ func vulkanSpecIRBasetypeBuild(typeNode *xmlSpecNode) VulkanSpecIRBasetype {
 	}
 
 	goType, ok := vulkanSpecIRCTypeToGo[underlying]
+	if !ok && underlying == "void" && strings.Contains(vulkanSpecIRBasetypeRawText(typeNode), "*") {
+		goType = "unsafe.Pointer"
+		ok = true
+	}
 	if !ok {
 		return VulkanSpecIRBasetype{}
 	}
@@ -82,4 +86,20 @@ func vulkanSpecIRBasetypeBuild(typeNode *xmlSpecNode) VulkanSpecIRBasetype {
 		Underlying: goType,
 		XMLDoc:     xmlSpecNodeDirectCommentsCollect(typeNode),
 	}
+}
+
+func vulkanSpecIRBasetypeRawText(typeNode *xmlSpecNode) string {
+	var parts []string
+	if text := strings.TrimSpace(typeNode.Text); text != "" {
+		parts = append(parts, text)
+	}
+	for _, child := range typeNode.Children {
+		if child.Name == "comment" {
+			continue
+		}
+		if text := strings.TrimSpace(child.Text); text != "" {
+			parts = append(parts, text)
+		}
+	}
+	return strings.Join(parts, " ")
 }

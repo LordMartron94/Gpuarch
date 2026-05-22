@@ -112,6 +112,9 @@ func vulkanRefpageCorpusNamesFromIR(ir VulkanSpecIR) []string {
 	for _, fn := range ir.Funcpointers {
 		add(fn.Name)
 	}
+	for _, command := range ir.Commands {
+		add(command.Name)
+	}
 	if ir.Constants.Name != "" {
 		for _, value := range ir.Constants.Values {
 			add(value.Key)

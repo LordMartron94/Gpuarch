@@ -15,6 +15,7 @@ const (
 	enumBindingFile             = "bindings_enums_gen.go"
 	flagsBindingFile            = "bindings_flags_gen.go"
 	funcpointerBindingFile      = "bindings_funcpointers_gen.go"
+	commandsBindingFile         = "bindings_commands_gen.go"
 	handlesBindingFile          = "bindings_handles_gen.go"
 	structsBindingFile          = "bindings_structs_gen.go"
 	vulkanBindingsGeneratorTool = "gpuarch Vulkan bindings generator"
@@ -35,6 +36,9 @@ func specToBindingsConvert(ir VulkanSpecIR, bindingsDir string, corpus VulkanRef
 		return err
 	}
 	if err := generateFuncpointerContent(ir.Funcpointers, bindingsDir, corpus); err != nil {
+		return err
+	}
+	if err := generateCommandsContent(ir.Commands, bindingsDir, corpus); err != nil {
 		return err
 	}
 	if err := generateHandlesContent(ir.Handles, bindingsDir, corpus); err != nil {
@@ -168,6 +172,95 @@ func generateFuncpointerContent(funcpointers []VulkanSpecIRFuncpointer, bindings
 	return writeBindingFile(bindingsDir, funcpointerBindingFile, elements)
 }
 
+func generateCommandsContent(commands []VulkanSpecIRCommand, bindingsDir string, corpus VulkanRefpageCorpus) error {
+	if len(commands) == 0 {
+		return nil
+	}
+
+	needsUnsafe := false
+	for _, command := range commands {
+		if vulkanSpecIRCommandNeedsUnsafe(command) {
+			needsUnsafe = true
+			break
+		}
+	}
+
+	elements := bindingFilePreamble()
+	if needsUnsafe {
+		elements = append(elements, gocode.FileElementFrom(gocode.DeclImportBlock("unsafe")))
+		blankLine(&elements)
+	}
+
+	for _, command := range commands {
+		elements = append(elements, vulkanSpecIRCommandBindingElements(command, corpus)...)
+	}
+
+	return writeBindingFile(bindingsDir, commandsBindingFile, elements)
+}
+
+func vulkanSpecIRCommandBindingElements(command VulkanSpecIRCommand, corpus VulkanRefpageCorpus) []codegen.FileElement {
+	if command.PFNTypeName == "" {
+		return nil
+	}
+
+	docSubject := command.Name
+	if docSubject == "" {
+		docSubject = command.PFNTypeName
+	}
+	doc := vulkanSpecIRDocCompose(docSubject, "", command.XMLDoc, corpus, "")
+
+	elements := make([]codegen.FileElement, 0, 2)
+
+	if command.AliasOf != "" {
+		elements = append(elements, gocode.FileElementFrom(
+			gocode.DeclTypeDefined(
+				command.PFNTypeName,
+				gocode.TypeExprNamed(command.AliasOf),
+				true,
+				vulkanSpecIRDocFormatExported(command.PFNTypeName, doc),
+			),
+		))
+		blankLine(&elements)
+		return elements
+	}
+
+	sig, err := vulkanSpecIRCommandGoTypeExpr(command)
+	if err != nil {
+		return nil
+	}
+
+	elements = append(elements, gocode.FileElementFrom(
+		gocode.DeclTypeDefined(
+			command.PFNTypeName,
+			sig,
+			false,
+			vulkanSpecIRDocFormatExported(command.PFNTypeName, doc),
+		),
+	))
+	blankLine(&elements)
+	return elements
+}
+
+func vulkanSpecIRCommandGoTypeExpr(command VulkanSpecIRCommand) (gocode.TypeExpr, error) {
+	return vulkanSpecIRFuncpointerGoTypeExpr(VulkanSpecIRFuncpointer{
+		Name:          command.PFNTypeName,
+		ReturnGoType:  command.ReturnGoType,
+		ReturnsUnsafe: command.ReturnsUnsafe,
+		Params:        command.Params,
+	})
+}
+
+func vulkanSpecIRCommandNeedsUnsafe(command VulkanSpecIRCommand) bool {
+	if command.AliasOf != "" {
+		return false
+	}
+	return vulkanSpecIRFuncpointerNeedsUnsafe(VulkanSpecIRFuncpointer{
+		ReturnGoType:  command.ReturnGoType,
+		ReturnsUnsafe: command.ReturnsUnsafe,
+		Params:        command.Params,
+	})
+}
+
 func vulkanSpecIRFuncpointerBindingElements(fn VulkanSpecIRFuncpointer, corpus VulkanRefpageCorpus) []codegen.FileElement {
 	if fn.Name == "" {
 		return nil
@@ -255,6 +348,18 @@ func bindingFilePreamble() []codegen.FileElement {
 
 func generateBasetypeContent(basetypes []VulkanSpecIRBasetype, bindingsDir string, corpus VulkanRefpageCorpus) error {
 	elements := bindingFilePreamble()
+
+	needsUnsafe := false
+	for _, basetype := range basetypes {
+		if basetype.Underlying == "unsafe.Pointer" {
+			needsUnsafe = true
+			break
+		}
+	}
+	if needsUnsafe {
+		elements = append(elements, gocode.FileElementFrom(gocode.DeclImportBlock("unsafe")))
+		blankLine(&elements)
+	}
 
 	for _, basetype := range basetypes {
 		doc := vulkanSpecIRDocCompose(basetype.Name, "", basetype.XMLDoc, corpus, "")

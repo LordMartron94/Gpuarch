@@ -21,6 +21,7 @@ func vulkanSpecIRBuild(root *xmlSpecNode) VulkanSpecIR {
 	handles := vulkanSpecIRHandlesCollect(root)
 	typeRegistry := vulkanSpecIRTypeRegistryCollect(root)
 	funcpointers := vulkanSpecIRFuncpointersCollect(root, typeRegistry)
+	commands := vulkanSpecIRCommandsCollect(root, typeRegistry)
 	structs := vulkanSpecIRStructsCollect(root, typeRegistry)
 	apiVersions := vulkanSpecIRApiVersionsCollect(root)
 	extensions := vulkanSpecIRExtensionsCollect(root)
@@ -28,6 +29,7 @@ func vulkanSpecIRBuild(root *xmlSpecNode) VulkanSpecIR {
 
 	sort.Slice(basetypes, func(i, j int) bool { return basetypes[i].Name < basetypes[j].Name })
 	sort.Slice(funcpointers, func(i, j int) bool { return funcpointers[i].Name < funcpointers[j].Name })
+	sort.Slice(commands, func(i, j int) bool { return commands[i].PFNTypeName < commands[j].PFNTypeName })
 	sort.Slice(structs, func(i, j int) bool {
 		if structs[i].AliasOf != structs[j].AliasOf {
 			return structs[i].AliasOf == ""
@@ -45,6 +47,7 @@ func vulkanSpecIRBuild(root *xmlSpecNode) VulkanSpecIR {
 		Enums:        enums,
 		Flags:        flags,
 		Funcpointers: funcpointers,
+		Commands:     commands,
 		Handles:      handles,
 		Structs:      structs,
 		ApiVersions:  apiVersions,

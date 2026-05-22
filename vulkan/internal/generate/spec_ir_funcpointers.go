@@ -29,41 +29,10 @@ func vulkanSpecIRFuncpointersCollectWalk(node *xmlSpecNode, registry VulkanSpecI
 }
 
 func vulkanSpecIRFuncpointerBuild(typeNode *xmlSpecNode, registry VulkanSpecIRTypeRegistry) VulkanSpecIRFuncpointer {
-	var protoNode *xmlSpecNode
-	params := make([]VulkanSpecIRFuncpointerParam, 0, len(typeNode.Children))
-
-	for _, child := range typeNode.Children {
-		switch child.Name {
-		case "proto":
-			protoNode = child
-		case "param":
-			if param, ok := vulkanSpecIRFuncpointerParamBuild(child, registry); ok {
-				params = append(params, param)
-			}
-		}
-	}
-
-	if protoNode == nil {
+	name, returnGoType, returnsUnsafe, params, ok := vulkanSpecIRProtoParamsBuild(typeNode, registry, nil)
+	if !ok || name == "" || !strings.HasPrefix(name, "PFN_") {
 		return VulkanSpecIRFuncpointer{}
 	}
-
-	name := vulkanSpecIRProtoName(protoNode)
-	if name == "" || !strings.HasPrefix(name, "PFN_") {
-		return VulkanSpecIRFuncpointer{}
-	}
-
-	returnGoType, returnsUnsafe, ok := vulkanSpecIRProtoReturnGoType(protoNode, registry)
-	if !ok {
-		return VulkanSpecIRFuncpointer{}
-	}
-
-	needsUnsafe := returnsUnsafe
-	for _, param := range params {
-		if param.NeedsUnsafe {
-			needsUnsafe = true
-		}
-	}
-	_ = needsUnsafe
 
 	return VulkanSpecIRFuncpointer{
 		Name:          name,
@@ -219,12 +188,21 @@ func vulkanSpecIRParamRawText(paramNode *xmlSpecNode) string {
 
 func vulkanSpecIRFuncpointerGoTypeExpr(fn VulkanSpecIRFuncpointer) (gocode.TypeExpr, error) {
 	params := make([]gocode.ParamType, 0, len(fn.Params))
+	seenNames := make(map[string]struct{}, len(fn.Params))
 	for _, param := range fn.Params {
 		typ, err := gocode.TypeExprFromGoTypeString(param.GoType)
 		if err != nil {
 			return gocode.TypeExpr{}, err
 		}
-		params = append(params, gocode.ParamType{Name: param.Name, Type: typ})
+		goName := vulkanSpecIRSignatureParamGoName(param.Name)
+		if goName != "" {
+			if _, exists := seenNames[goName]; exists {
+				goName = ""
+			} else {
+				seenNames[goName] = struct{}{}
+			}
+		}
+		params = append(params, gocode.ParamType{Name: goName, Type: typ})
 	}
 
 	var returns []gocode.TypeExpr
@@ -237,6 +215,24 @@ func vulkanSpecIRFuncpointerGoTypeExpr(fn VulkanSpecIRFuncpointer) (gocode.TypeE
 	}
 
 	return gocode.TypeExprFunc(params, returns), nil
+}
+
+func vulkanSpecIRSignatureParamGoName(name string) string {
+	if vulkanSpecIRParamGoNameReserved(name) {
+		return ""
+	}
+	return name
+}
+
+func vulkanSpecIRParamGoNameReserved(name string) bool {
+	switch name {
+	case "break", "case", "chan", "const", "continue", "default", "defer", "else",
+		"fallthrough", "for", "func", "go", "goto", "if", "import", "interface",
+		"map", "package", "range", "return", "select", "struct", "switch", "type", "var":
+		return true
+	default:
+		return false
+	}
 }
 
 func vulkanSpecIRFuncpointerNeedsUnsafe(fn VulkanSpecIRFuncpointer) bool {
