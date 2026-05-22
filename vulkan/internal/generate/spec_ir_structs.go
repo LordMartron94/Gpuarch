@@ -45,7 +45,7 @@ func vulkanSpecIRStructBuild(typeNode *xmlSpecNode, registry VulkanSpecIRTypeReg
 		Name:    name,
 		IsUnion: isUnion,
 		AliasOf: xmlSpecNodeAttrValue(typeNode, "alias"),
-		Doc:     xmlSpecNodeCommentAttr(typeNode),
+		XMLDoc:  xmlSpecNodeDirectCommentsCollect(typeNode),
 	}
 
 	seenFields := make(map[string]struct{})
@@ -79,10 +79,11 @@ func vulkanSpecIRStructFieldBuild(memberNode *xmlSpecNode, registry VulkanSpecIR
 	}
 
 	return VulkanSpecIRStructField{
-		Name:        vulkanSpecIRMemberGoFieldName(name),
-		GoType:      goType,
-		Doc:         vulkanSpecIRDocJoin(xmlSpecNodeCommentAttr(memberNode)),
-		NeedsUnsafe: strings.Contains(goType, "unsafe.Pointer"),
+		Name:             vulkanSpecIRMemberGoFieldName(name),
+		VulkanMemberName: name,
+		GoType:           goType,
+		XMLDoc:           xmlSpecNodeDirectCommentsCollect(memberNode),
+		NeedsUnsafe:      strings.Contains(goType, "unsafe.Pointer"),
 	}, true
 }
 
@@ -245,8 +246,8 @@ func vulkanSpecIRStructsResolveAliases(structs []VulkanSpecIRStruct) {
 			continue
 		}
 		structs[i].IsUnion = target.IsUnion
-		if structs[i].Doc == "" {
-			structs[i].Doc = target.Doc
+		if structs[i].XMLDoc == "" {
+			structs[i].XMLDoc = target.XMLDoc
 		}
 	}
 }

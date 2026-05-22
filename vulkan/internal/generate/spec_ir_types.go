@@ -19,7 +19,7 @@ VulkanSpecIRConstants is the API Constants block from <enums type="constants">.
 */
 type VulkanSpecIRConstants struct {
 	Name   string
-	Doc    string
+	XMLDoc string
 	Values []VulkanSpecIRConstantValue
 }
 
@@ -33,7 +33,7 @@ type VulkanSpecIRConstantValue struct {
 	Key    string
 	Value  string
 	GoType string
-	Doc    string
+	XMLDoc string
 }
 
 /*
@@ -45,7 +45,7 @@ type VulkanSpecIRStruct struct {
 	Name    string
 	IsUnion bool
 	AliasOf string
-	Doc     string
+	XMLDoc  string
 	Fields  []VulkanSpecIRStructField
 }
 
@@ -53,10 +53,11 @@ type VulkanSpecIRStruct struct {
 VulkanSpecIRStructField is one struct or union member.
 */
 type VulkanSpecIRStructField struct {
-	Name        string
-	GoType      string
-	Doc         string
-	NeedsUnsafe bool
+	Name             string
+	VulkanMemberName string
+	GoType           string
+	XMLDoc           string
+	NeedsUnsafe      bool
 }
 
 /*
@@ -72,7 +73,7 @@ type VulkanSpecIRHandle struct {
 	Parent         string
 	ObjectTypeEnum string
 	AliasOf        string
-	Doc            string
+	XMLDoc         string
 }
 
 /*
@@ -81,7 +82,7 @@ VulkanSpecIRBasetype is one Vulkan typedef from <type category="basetype"> with 
 type VulkanSpecIRBasetype struct {
 	Name       string
 	Underlying string
-	Doc        string
+	XMLDoc     string
 }
 
 /*
@@ -89,7 +90,7 @@ VulkanSpecIREnum is one Vulkan enumerated type from <enums type="enum" name="...
 */
 type VulkanSpecIREnum struct {
 	Name   string
-	Doc    string
+	XMLDoc string
 	Values []VulkanSpecIREnumValue
 }
 
@@ -99,9 +100,9 @@ VulkanSpecIREnumValue is one enumerator from <enum name="..." value="...">.
 Key is the Vulkan token name. Value is the numeric token value as written in the registry XML.
 */
 type VulkanSpecIREnumValue struct {
-	Key   string
-	Value string
-	Doc   string
+	Key    string
+	Value  string
+	XMLDoc string
 }
 
 /*
@@ -113,7 +114,7 @@ Flags type used in Go bindings (for example VkQueueFlags).
 type VulkanSpecIRFlags struct {
 	Name          string
 	AggregateName string
-	Doc           string
+	XMLDoc        string
 	Bitwidth      int
 	BaseTypeName  string
 	Values        []VulkanSpecIRFlagsValue
@@ -125,7 +126,7 @@ VulkanSpecIRFlagsValue is one bit flag from <enum bitpos="..." name="..."> or <e
 Key is the Vulkan token name. Value is the Go literal expression (for example 1 << 2 or 0x10).
 */
 type VulkanSpecIRFlagsValue struct {
-	Key   string
-	Value string
-	Doc   string
+	Key    string
+	Value  string
+	XMLDoc string
 }

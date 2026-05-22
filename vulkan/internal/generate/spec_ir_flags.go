@@ -49,7 +49,7 @@ func vulkanSpecIRFlagsMergeRegistry(registry VulkanSpecIRBitmaskRegistry, byAggr
 		byAggregate[info.AggregateName] = VulkanSpecIRFlags{
 			Name:          info.FlagBitsName,
 			AggregateName: info.AggregateName,
-			Doc:           info.Doc,
+			XMLDoc:        info.XMLDoc,
 			Bitwidth:      vulkanSpecIRFlagsBitwidthFromBase(info.BaseTypeName),
 			BaseTypeName:  info.BaseTypeName,
 		}
@@ -63,16 +63,16 @@ func vulkanSpecIRFlagsBuild(enumsNode *xmlSpecNode, registry VulkanSpecIRBitmask
 	}
 
 	flagType := VulkanSpecIRFlags{
-		Name: flagBitsName,
-		Doc:  xmlSpecNodeCommentAttr(enumsNode),
+		Name:   flagBitsName,
+		XMLDoc: xmlSpecNodeDirectCommentsCollect(enumsNode),
 	}
 
 	if info, ok := registry.Lookup(flagBitsName); ok {
 		flagType.AggregateName = info.AggregateName
 		flagType.BaseTypeName = info.BaseTypeName
 		flagType.Bitwidth = vulkanSpecIRFlagsBitwidthFromBase(info.BaseTypeName)
-		if flagType.Doc == "" {
-			flagType.Doc = info.Doc
+		if flagType.XMLDoc == "" {
+			flagType.XMLDoc = info.XMLDoc
 		}
 	} else {
 		flagType.AggregateName = vulkanSpecIRFlagsAggregateName(flagBitsName)

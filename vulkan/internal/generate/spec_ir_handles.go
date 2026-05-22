@@ -61,7 +61,7 @@ func vulkanSpecIRHandleBuild(typeNode *xmlSpecNode) VulkanSpecIRHandle {
 		Parent:         xmlSpecNodeAttrValue(typeNode, "parent"),
 		ObjectTypeEnum: xmlSpecNodeAttrValue(typeNode, "objtypeenum"),
 		AliasOf:        xmlSpecNodeAttrValue(typeNode, "alias"),
-		Doc:            vulkanSpecIRHandleDoc(typeNode, name, dispatchable),
+		XMLDoc:         vulkanSpecIRHandleXMLDoc(typeNode, dispatchable),
 	}
 }
 
@@ -112,9 +112,9 @@ func vulkanSpecIRHandleMacroParse(typeNode *xmlSpecNode) string {
 	return ""
 }
 
-func vulkanSpecIRHandleDoc(typeNode *xmlSpecNode, name string, dispatchable bool) string {
+func vulkanSpecIRHandleXMLDoc(typeNode *xmlSpecNode, dispatchable bool) string {
 	parts := make([]string, 0, 4)
-	if comment := xmlSpecNodeCommentAttr(typeNode); comment != "" {
+	if comment := xmlSpecNodeDirectCommentsCollect(typeNode); comment != "" {
 		parts = append(parts, comment)
 	}
 	if dispatchable {

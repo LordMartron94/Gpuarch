@@ -138,9 +138,9 @@ func vulkanSpecIRExtensionEnumApply(
 			return
 		}
 		vulkanSpecIRFlagsAppendValue(flagsByFlagBits, flagsByAggregate, extends, VulkanSpecIRFlagsValue{
-			Key:   key,
-			Value: value,
-			Doc:   doc,
+			Key:    key,
+			Value:  value,
+			XMLDoc: doc,
 		})
 		return
 	}
@@ -155,17 +155,17 @@ func vulkanSpecIRExtensionEnumApply(
 
 	if vulkanSpecIRFlagsLookup(flagsByFlagBits, flagsByAggregate, extends) != nil {
 		vulkanSpecIRFlagsAppendValue(flagsByFlagBits, flagsByAggregate, extends, VulkanSpecIRFlagsValue{
-			Key:   key,
-			Value: value,
-			Doc:   doc,
+			Key:    key,
+			Value:  value,
+			XMLDoc: doc,
 		})
 		return
 	}
 
 	vulkanSpecIREnumAppendValue(enumByName, extends, VulkanSpecIREnumValue{
-		Key:   key,
-		Value: value,
-		Doc:   doc,
+		Key:    key,
+		Value:  value,
+		XMLDoc: doc,
 	})
 }
 
@@ -180,7 +180,7 @@ func vulkanSpecIRExtensionEnumApplyAlias(
 ) {
 	if enumType, ok := enumByName[extends]; ok {
 		if value := vulkanSpecIREnumFindValue(enumType.Values, aliasTarget); value != "" {
-			vulkanSpecIREnumAppendValue(enumByName, extends, VulkanSpecIREnumValue{Key: key, Value: value, Doc: doc})
+			vulkanSpecIREnumAppendValue(enumByName, extends, VulkanSpecIREnumValue{Key: key, Value: value, XMLDoc: doc})
 		}
 		return
 	}
@@ -188,7 +188,7 @@ func vulkanSpecIRExtensionEnumApplyAlias(
 	if flagType := vulkanSpecIRFlagsLookup(flagsByFlagBits, flagsByAggregate, extends); flagType != nil {
 		if value := vulkanSpecIREnumFindValueFlags(flagType.Values, aliasTarget); value != "" {
 			vulkanSpecIRFlagsAppendValue(flagsByFlagBits, flagsByAggregate, extends, VulkanSpecIRFlagsValue{
-				Key: key, Value: value, Doc: doc,
+				Key: key, Value: value, XMLDoc: doc,
 			})
 		}
 	}

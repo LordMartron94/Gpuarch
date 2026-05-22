@@ -20,29 +20,29 @@ const (
 	vulkanEnumBaseTypeName      = "VkEnum"
 )
 
-func specToBindingsConvert(ir VulkanSpecIR, bindingsDir string) error {
-	if err := generateBasetypeContent(ir.Basetypes, bindingsDir); err != nil {
+func specToBindingsConvert(ir VulkanSpecIR, bindingsDir string, corpus VulkanRefpageCorpus) error {
+	if err := generateBasetypeContent(ir.Basetypes, bindingsDir, corpus); err != nil {
 		return err
 	}
-	if err := generateConstantsContent(ir.Constants, bindingsDir); err != nil {
+	if err := generateConstantsContent(ir.Constants, bindingsDir, corpus); err != nil {
 		return err
 	}
-	if err := generateEnumContent(ir.Enums, bindingsDir); err != nil {
+	if err := generateEnumContent(ir.Enums, bindingsDir, corpus); err != nil {
 		return err
 	}
-	if err := generateFlagsContent(ir.Flags, bindingsDir); err != nil {
+	if err := generateFlagsContent(ir.Flags, bindingsDir, corpus); err != nil {
 		return err
 	}
-	if err := generateHandlesContent(ir.Handles, bindingsDir); err != nil {
+	if err := generateHandlesContent(ir.Handles, bindingsDir, corpus); err != nil {
 		return err
 	}
-	if err := generateStructsContent(ir.Structs, bindingsDir); err != nil {
+	if err := generateStructsContent(ir.Structs, bindingsDir, corpus); err != nil {
 		return err
 	}
 	return vulkanBindingsFormat(bindingsDir)
 }
 
-func generateStructsContent(structs []VulkanSpecIRStruct, bindingsDir string) error {
+func generateStructsContent(structs []VulkanSpecIRStruct, bindingsDir string, corpus VulkanRefpageCorpus) error {
 	if len(structs) == 0 {
 		return nil
 	}
@@ -64,18 +64,18 @@ func generateStructsContent(structs []VulkanSpecIRStruct, bindingsDir string) er
 	}
 
 	for _, aggregate := range structs {
-		elements = append(elements, vulkanSpecIRStructBindingElements(aggregate)...)
+		elements = append(elements, vulkanSpecIRStructBindingElements(aggregate, corpus)...)
 	}
 
 	return writeBindingFile(bindingsDir, structsBindingFile, elements)
 }
 
-func vulkanSpecIRStructBindingElements(aggregate VulkanSpecIRStruct) []codegen.FileElement {
+func vulkanSpecIRStructBindingElements(aggregate VulkanSpecIRStruct, corpus VulkanRefpageCorpus) []codegen.FileElement {
 	if aggregate.Name == "" {
 		return nil
 	}
 
-	doc := aggregate.Doc
+	doc := vulkanSpecIRDocCompose(aggregate.Name, aggregate.AliasOf, aggregate.XMLDoc, corpus, "")
 	if aggregate.IsUnion {
 		doc = vulkanSpecIRDocJoin("Vulkan union type.", doc)
 	}
@@ -87,7 +87,7 @@ func vulkanSpecIRStructBindingElements(aggregate VulkanSpecIRStruct) []codegen.F
 				aggregate.Name,
 				gocode.TypeExprNamed(aggregate.AliasOf),
 				true,
-				gocode.GoDocFormatExported(aggregate.Name, doc),
+				vulkanSpecIRDocFormatExported(aggregate.Name, doc),
 			),
 		))
 		blankLine(&elements)
@@ -95,6 +95,7 @@ func vulkanSpecIRStructBindingElements(aggregate VulkanSpecIRStruct) []codegen.F
 	}
 
 	fields := make([]gocode.StructFieldDecl, 0, len(aggregate.Fields))
+	fieldIndex := 0
 	for _, field := range aggregate.Fields {
 		if field.Name == "" || field.GoType == "" {
 			continue
@@ -103,16 +104,30 @@ func vulkanSpecIRStructBindingElements(aggregate VulkanSpecIRStruct) []codegen.F
 		if err != nil {
 			continue
 		}
+		fieldDoc := vulkanSpecIRDocCompose(
+			aggregate.Name,
+			aggregate.AliasOf,
+			field.XMLDoc,
+			corpus,
+			field.VulkanMemberName,
+		)
+		formattedDoc := vulkanSpecIRDocFormatStructField(field.Name, fieldDoc)
+		var leading []codegen.Node
+		if fieldIndex > 0 && formattedDoc != "" {
+			leading = append(leading, gocode.LayoutBlankLineNode())
+		}
 		fields = append(fields, gocode.StructFieldTypeDoc(
 			field.Name,
 			typ,
-			gocode.GoDocFormatExported(field.Name, field.Doc),
+			formattedDoc,
+			leading...,
 		))
+		fieldIndex++
 	}
 
 	elements := make([]codegen.FileElement, 0, 2)
 	elements = append(elements, gocode.FileElementFrom(
-		gocode.DeclTypeStruct(aggregate.Name, fields, gocode.GoDocFormatExported(aggregate.Name, doc)),
+		gocode.DeclTypeStruct(aggregate.Name, fields, vulkanSpecIRDocFormatExported(aggregate.Name, doc)),
 	))
 	blankLine(&elements)
 	return elements
@@ -130,19 +145,19 @@ func vulkanBindingsFormat(bindingsDir string) error {
 	return nil
 }
 
-func generateHandlesContent(handles []VulkanSpecIRHandle, bindingsDir string) error {
+func generateHandlesContent(handles []VulkanSpecIRHandle, bindingsDir string, corpus VulkanRefpageCorpus) error {
 	if len(handles) == 0 {
 		return nil
 	}
 
 	elements := bindingFilePreamble()
 	for _, handle := range handles {
-		elements = append(elements, vulkanSpecIRHandleBindingElements(handle)...)
+		elements = append(elements, vulkanSpecIRHandleBindingElements(handle, corpus)...)
 	}
 	return writeBindingFile(bindingsDir, handlesBindingFile, elements)
 }
 
-func vulkanSpecIRHandleBindingElements(handle VulkanSpecIRHandle) []codegen.FileElement {
+func vulkanSpecIRHandleBindingElements(handle VulkanSpecIRHandle, corpus VulkanRefpageCorpus) []codegen.FileElement {
 	if handle.Name == "" || handle.Underlying == "" {
 		return nil
 	}
@@ -152,13 +167,15 @@ func vulkanSpecIRHandleBindingElements(handle VulkanSpecIRHandle) []codegen.File
 		underlying = gocode.TypeExprNamed(handle.AliasOf)
 	}
 
+	doc := vulkanSpecIRDocCompose(handle.Name, handle.AliasOf, handle.XMLDoc, corpus, "")
+
 	elements := make([]codegen.FileElement, 0, 2)
 	elements = append(elements, gocode.FileElementFrom(
 		gocode.DeclTypeDefined(
 			handle.Name,
 			underlying,
 			handle.AliasOf != "",
-			gocode.GoDocFormatExported(handle.Name, handle.Doc),
+			vulkanSpecIRDocFormatExported(handle.Name, doc),
 		),
 	))
 	blankLine(&elements)
@@ -189,16 +206,17 @@ func bindingFilePreamble() []codegen.FileElement {
 	return elements
 }
 
-func generateBasetypeContent(basetypes []VulkanSpecIRBasetype, bindingsDir string) error {
+func generateBasetypeContent(basetypes []VulkanSpecIRBasetype, bindingsDir string, corpus VulkanRefpageCorpus) error {
 	elements := bindingFilePreamble()
 
 	for _, basetype := range basetypes {
+		doc := vulkanSpecIRDocCompose(basetype.Name, "", basetype.XMLDoc, corpus, "")
 		elements = append(elements, gocode.FileElementFrom(
 			gocode.DeclTypeDefined(
 				basetype.Name,
 				gocode.TypeExprNamed(basetype.Underlying),
 				true,
-				gocode.GoDocFormatExported(basetype.Name, basetype.Doc),
+				vulkanSpecIRDocFormatExported(basetype.Name, doc),
 			),
 		))
 	}
@@ -206,17 +224,17 @@ func generateBasetypeContent(basetypes []VulkanSpecIRBasetype, bindingsDir strin
 	return writeBindingFile(bindingsDir, basetypeBindingFile, elements)
 }
 
-func generateConstantsContent(constants VulkanSpecIRConstants, bindingsDir string) error {
+func generateConstantsContent(constants VulkanSpecIRConstants, bindingsDir string, corpus VulkanRefpageCorpus) error {
 	if len(constants.Values) == 0 {
 		return nil
 	}
 
 	elements := bindingFilePreamble()
-	elements = append(elements, vulkanSpecIRConstantsBindingElements(constants)...)
+	elements = append(elements, vulkanSpecIRConstantsBindingElements(constants, corpus)...)
 	return writeBindingFile(bindingsDir, constantsBindingFile, elements)
 }
 
-func vulkanSpecIRConstantsBindingElements(constants VulkanSpecIRConstants) []codegen.FileElement {
+func vulkanSpecIRConstantsBindingElements(constants VulkanSpecIRConstants, corpus VulkanRefpageCorpus) []codegen.FileElement {
 	specs := make([]gocode.ConstSpec, 0, len(constants.Values))
 	for _, value := range constants.Values {
 		if value.Key == "" || value.Value == "" {
@@ -228,11 +246,12 @@ func vulkanSpecIRConstantsBindingElements(constants VulkanSpecIRConstants) []cod
 			typ = gocode.TypeExprNamedPtr(value.GoType)
 		}
 
+		doc := vulkanSpecIRDocCompose(value.Key, "", value.XMLDoc, corpus, "")
 		specs = append(specs, gocode.ConstSpecNew(
 			value.Key,
 			typ,
 			value.Value,
-			gocode.GoDocFormatExported(value.Key, value.Doc),
+			vulkanSpecIRDocFormatExported(value.Key, doc),
 		))
 	}
 
@@ -240,55 +259,61 @@ func vulkanSpecIRConstantsBindingElements(constants VulkanSpecIRConstants) []cod
 		return nil
 	}
 
+	groupDoc := ""
+	if constants.Name != "" {
+		groupDoc = vulkanSpecIRDocCompose(constants.Name, "", constants.XMLDoc, corpus, "")
+	}
+
 	elements := make([]codegen.FileElement, 0, 2)
 	elements = append(elements, gocode.FileElementFrom(
-		gocode.DeclConstGroup(specs, constants.Doc, true),
+		gocode.DeclConstGroup(specs, groupDoc, true),
 	))
 	blankLine(&elements)
 	return elements
 }
 
-func generateEnumContent(enums []VulkanSpecIREnum, bindingsDir string) error {
+func generateEnumContent(enums []VulkanSpecIREnum, bindingsDir string, corpus VulkanRefpageCorpus) error {
 	elements := bindingFilePreamble()
 	elements = append(elements, gocode.FileElementFrom(
 		gocode.DeclTypeDefined(
 			vulkanEnumBaseTypeName,
 			gocode.TypeExprNamed("int32"),
 			true,
-			gocode.GoDocFormatExported(vulkanEnumBaseTypeName, "is the base type for Vulkan enumerated types in the registry."),
+			vulkanSpecIRDocFormatExported(vulkanEnumBaseTypeName, "is the base type for Vulkan enumerated types in the registry."),
 		),
 	))
 	blankLine(&elements)
 
 	for _, enum := range enums {
-		elements = append(elements, vulkanSpecIREnumBindingElements(enum)...)
+		elements = append(elements, vulkanSpecIREnumBindingElements(enum, corpus)...)
 	}
 
 	return writeBindingFile(bindingsDir, enumBindingFile, elements)
 }
 
-func generateFlagsContent(flags []VulkanSpecIRFlags, bindingsDir string) error {
+func generateFlagsContent(flags []VulkanSpecIRFlags, bindingsDir string, corpus VulkanRefpageCorpus) error {
 	elements := bindingFilePreamble()
 
 	for _, flagType := range flags {
-		elements = append(elements, vulkanSpecIRFlagsBindingElements(flagType)...)
+		elements = append(elements, vulkanSpecIRFlagsBindingElements(flagType, corpus)...)
 	}
 
 	return writeBindingFile(bindingsDir, flagsBindingFile, elements)
 }
 
-func vulkanSpecIREnumBindingElements(enum VulkanSpecIREnum) []codegen.FileElement {
+func vulkanSpecIREnumBindingElements(enum VulkanSpecIREnum, corpus VulkanRefpageCorpus) []codegen.FileElement {
 	if enum.Name == "" || len(enum.Values) == 0 {
 		return nil
 	}
 
+	doc := vulkanSpecIRDocCompose(enum.Name, "", enum.XMLDoc, corpus, "")
 	elements := make([]codegen.FileElement, 0, 3)
 	elements = append(elements, gocode.FileElementFrom(
 		gocode.DeclTypeDefined(
 			enum.Name,
 			gocode.TypeExprNamed(vulkanEnumBaseTypeName),
 			false,
-			gocode.GoDocFormatExported(enum.Name, enum.Doc),
+			vulkanSpecIRDocFormatExported(enum.Name, doc),
 		),
 	))
 
@@ -298,11 +323,12 @@ func vulkanSpecIREnumBindingElements(enum VulkanSpecIREnum) []codegen.FileElemen
 		if value.Key == "" || value.Value == "" {
 			continue
 		}
+		valueDoc := vulkanSpecIRDocCompose(value.Key, "", value.XMLDoc, corpus, "")
 		specs = append(specs, gocode.ConstSpecNew(
 			value.Key,
 			enumType,
 			value.Value,
-			gocode.GoDocFormatExported(value.Key, value.Doc),
+			vulkanSpecIRDocFormatExported(value.Key, valueDoc),
 		))
 	}
 
@@ -316,18 +342,19 @@ func vulkanSpecIREnumBindingElements(enum VulkanSpecIREnum) []codegen.FileElemen
 	return elements
 }
 
-func vulkanSpecIRFlagsBindingElements(flagType VulkanSpecIRFlags) []codegen.FileElement {
+func vulkanSpecIRFlagsBindingElements(flagType VulkanSpecIRFlags, corpus VulkanRefpageCorpus) []codegen.FileElement {
 	if flagType.AggregateName == "" {
 		return nil
 	}
 
+	doc := vulkanSpecIRDocCompose(flagType.AggregateName, "", flagType.XMLDoc, corpus, "")
 	elements := make([]codegen.FileElement, 0, 3)
 	elements = append(elements, gocode.FileElementFrom(
 		gocode.DeclTypeDefined(
 			flagType.AggregateName,
 			gocode.TypeExprNamed(flagType.BaseTypeName),
 			false,
-			gocode.GoDocFormatExported(flagType.AggregateName, flagType.Doc),
+			vulkanSpecIRDocFormatExported(flagType.AggregateName, doc),
 		),
 	))
 
@@ -335,11 +362,12 @@ func vulkanSpecIRFlagsBindingElements(flagType VulkanSpecIRFlags) []codegen.File
 		specs := make([]gocode.ConstSpec, 0, len(flagType.Values))
 		flagsType := gocode.TypeExprNamedPtr(flagType.AggregateName)
 		for _, value := range flagType.Values {
+			valueDoc := vulkanSpecIRDocCompose(value.Key, "", value.XMLDoc, corpus, "")
 			specs = append(specs, gocode.ConstSpecNew(
 				value.Key,
 				flagsType,
 				value.Value,
-				gocode.GoDocFormatExported(value.Key, value.Doc),
+				vulkanSpecIRDocFormatExported(value.Key, valueDoc),
 			))
 		}
 		elements = append(elements, gocode.FileElementFrom(

@@ -13,9 +13,9 @@ type vulkanSpecIRRawValue struct {
 func vulkanSpecIRRawValuesResolveEnumValues(entries []vulkanSpecIRRawValue) []VulkanSpecIREnumValue {
 	return vulkanSpecIRRawValuesResolve(entries, func(entry vulkanSpecIRRawValue) VulkanSpecIREnumValue {
 		return VulkanSpecIREnumValue{
-			Key:   entry.Key,
-			Value: entry.Value,
-			Doc:   entry.Doc,
+			Key:    entry.Key,
+			Value:  entry.Value,
+			XMLDoc: entry.Doc,
 		}
 	})
 }
@@ -23,9 +23,9 @@ func vulkanSpecIRRawValuesResolveEnumValues(entries []vulkanSpecIRRawValue) []Vu
 func vulkanSpecIRRawValuesResolveFlagsValues(entries []vulkanSpecIRRawValue) []VulkanSpecIRFlagsValue {
 	return vulkanSpecIRRawValuesResolve(entries, func(entry vulkanSpecIRRawValue) VulkanSpecIRFlagsValue {
 		return VulkanSpecIRFlagsValue{
-			Key:   entry.Key,
-			Value: entry.Value,
-			Doc:   entry.Doc,
+			Key:    entry.Key,
+			Value:  entry.Value,
+			XMLDoc: entry.Doc,
 		}
 	})
 }

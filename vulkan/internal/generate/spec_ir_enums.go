@@ -24,8 +24,8 @@ func vulkanSpecIREnumsCollectWalk(node *xmlSpecNode, enums *[]VulkanSpecIREnum) 
 
 func vulkanSpecIREnumBuild(enumsNode *xmlSpecNode) VulkanSpecIREnum {
 	enumType := VulkanSpecIREnum{
-		Name: xmlSpecNodeAttrValue(enumsNode, "name"),
-		Doc:  xmlSpecNodeCommentAttr(enumsNode),
+		Name:   xmlSpecNodeAttrValue(enumsNode, "name"),
+		XMLDoc: xmlSpecNodeDirectCommentsCollect(enumsNode),
 	}
 
 	var rawValues []vulkanSpecIRRawValue

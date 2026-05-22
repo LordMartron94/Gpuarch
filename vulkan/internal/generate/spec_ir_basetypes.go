@@ -80,6 +80,6 @@ func vulkanSpecIRBasetypeBuild(typeNode *xmlSpecNode) VulkanSpecIRBasetype {
 	return VulkanSpecIRBasetype{
 		Name:       name,
 		Underlying: goType,
-		Doc:        xmlSpecNodeCommentAttr(typeNode),
+		XMLDoc:     xmlSpecNodeDirectCommentsCollect(typeNode),
 	}
 }

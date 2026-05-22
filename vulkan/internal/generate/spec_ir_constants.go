@@ -41,8 +41,8 @@ func vulkanSpecIRConstantsCollectWalk(node *xmlSpecNode, result *VulkanSpecIRCon
 
 func vulkanSpecIRConstantsBuild(enumsNode *xmlSpecNode) VulkanSpecIRConstants {
 	block := VulkanSpecIRConstants{
-		Name: xmlSpecNodeAttrValue(enumsNode, "name"),
-		Doc:  xmlSpecNodeCommentAttr(enumsNode),
+		Name:   xmlSpecNodeAttrValue(enumsNode, "name"),
+		XMLDoc: xmlSpecNodeDirectCommentsCollect(enumsNode),
 	}
 
 	var sectionDoc string
@@ -76,7 +76,7 @@ func vulkanSpecIRConstantValueBuild(enumNode *xmlSpecNode, sectionDoc string) Vu
 		Key:    xmlSpecNodeAttrValue(enumNode, "name"),
 		Value:  goValue,
 		GoType: goType,
-		Doc:    vulkanSpecIRDocJoin(sectionDoc, xmlSpecNodeCommentAttr(enumNode)),
+		XMLDoc: vulkanSpecIRDocJoin(sectionDoc, xmlSpecNodeCommentAttr(enumNode)),
 	}
 }
 

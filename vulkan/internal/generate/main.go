@@ -13,8 +13,14 @@ const specDebug string = "vulkan_spec_debug.txt"
 func main() {
 	var specOutputDir string
 	var bindingOutputDir string
+	var refpageDir string
+	var refpageSkipFetch bool
+	var refpageUpdate bool
 	flag.StringVar(&specOutputDir, "specOutputDir", "", "directory for vulkan_spec.xml (fetched when missing or when bindings are not requested)")
 	flag.StringVar(&bindingOutputDir, "bindingOutputDir", "", "directory for generated Vulkan bindings (reuses existing spec when present)")
+	flag.StringVar(&refpageDir, "refpageDir", "", "directory for cached Khronos man page HTML (defaults to <specOutputDir>/refpages)")
+	flag.BoolVar(&refpageSkipFetch, "refpageSkipFetch", false, "never fetch man pages; use refpage cache only")
+	flag.BoolVar(&refpageUpdate, "refpageUpdate", false, "re-fetch cached man pages when the registry reports newer content")
 	flag.Parse()
 
 	if specOutputDir == "" && bindingOutputDir == "" {
@@ -25,7 +31,7 @@ func main() {
 		if specOutputDir == "" {
 			panic("gpuarch generate: -bindingOutputDir requires -specOutputDir")
 		}
-		runBindingGeneration(specOutputDir, bindingOutputDir)
+		runBindingGeneration(specOutputDir, bindingOutputDir, refpageDir, refpageSkipFetch, refpageUpdate)
 		return
 	}
 
@@ -48,7 +54,7 @@ func runSpecFetch(specOutputDir string) {
 	fmt.Printf("Wrote Vulkan registry debug tree to %s\n", paths.DebugFile)
 }
 
-func runBindingGeneration(specOutputDir string, bindingOutputDir string) {
+func runBindingGeneration(specOutputDir string, bindingOutputDir string, refpageDir string, refpageSkipFetch bool, refpageUpdate bool) {
 	_, err := filepath.Abs(bindingOutputDir)
 	if err != nil {
 		panic(fmt.Errorf("resolve binding output path: %w", err))
@@ -73,7 +79,21 @@ func runBindingGeneration(specOutputDir string, bindingOutputDir string) {
 
 	ir := vulkanSpecIRBuild(root)
 
-	if err := specToBindingsConvert(ir, bindingOutputDir); err != nil {
+	if refpageDir == "" {
+		refpageDir = system.PathJoin(specOutputDir, "refpages")
+	}
+
+	refpageNames := vulkanRefpageCorpusNamesFromIR(ir)
+	corpus, err := vulkanRefpageCorpusEnsure(refpageDir, paths.SpecFile, refpageNames, vulkanRefpageFetchOptions{
+		SkipNetwork: refpageSkipFetch,
+		UpdateStale: refpageUpdate,
+	})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Loaded %d Vulkan man pages from %s\n", len(corpus), refpageDir)
+
+	if err := specToBindingsConvert(ir, bindingOutputDir, corpus); err != nil {
 		panic(err)
 	}
 

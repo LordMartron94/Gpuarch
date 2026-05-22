@@ -17,7 +17,7 @@ type VulkanSpecIRBitmaskTypeInfo struct {
 	FlagBitsName  string
 	AggregateName string
 	BaseTypeName  string
-	Doc           string
+	XMLDoc        string
 }
 
 func vulkanSpecIRBitmaskRegistryCollect(root *xmlSpecNode) VulkanSpecIRBitmaskRegistry {
@@ -73,7 +73,7 @@ func vulkanSpecIRBitmaskTypeInfoParse(typeNode *xmlSpecNode) VulkanSpecIRBitmask
 		FlagBitsName:  flagBitsName,
 		AggregateName: aggregateName,
 		BaseTypeName:  baseTypeName,
-		Doc:           xmlSpecNodeCommentAttr(typeNode),
+		XMLDoc:        xmlSpecNodeDirectCommentsCollect(typeNode),
 	}
 }
 
