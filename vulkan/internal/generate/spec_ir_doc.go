@@ -103,8 +103,15 @@ func vulkanSpecIRDocCompose(
 			parts = append(parts, "[Context]\n"+summary)
 		} else if xmlDoc != "" {
 			parts = append(parts, "[Context]\n"+xmlDoc)
-		} else if body := strings.TrimSpace(refpage.Description); body != "" && len(refpage.Members) == 0 {
-			parts = append(parts, "[Context]\n"+body)
+		}
+		if body := strings.TrimSpace(refpage.Description); body != "" {
+			parts = append(parts, "[Description]\n"+body)
+		}
+		if usage := vulkanSpecIRDocFormatValidUsageRules(refpage.ValidUsageExplicit); usage != "" {
+			parts = append(parts, "[Valid Usage]\n\n"+usage)
+		}
+		if usage := vulkanSpecIRDocFormatValidUsageRules(refpage.ValidUsageImplicit); usage != "" {
+			parts = append(parts, "[Valid Usage (Implicit)]\n\n"+usage)
 		}
 	} else {
 		if memberDoc := strings.TrimSpace(refpage.Members[memberCName]); memberDoc != "" {
@@ -126,6 +133,111 @@ func vulkanSpecIRDocCompose(
 	}
 
 	return vulkanSpecIRDocJoin(parts...)
+}
+
+/*
+vulkanSpecIRDocFormatValidUsageRules formats registry valid usage statements as a Markdown-friendly bullet list.
+
+Each rule is separated by a blank line so LSP hover renderers (for example gopls in Sublime Text) treat items as distinct list entries instead of one wrapped paragraph.
+*/
+func vulkanSpecIRDocFormatValidUsageRules(rules []string) string {
+	if len(rules) == 0 {
+		return ""
+	}
+
+	items := make([]string, 0, len(rules))
+	for _, rule := range rules {
+		item := vulkanSpecIRDocFormatValidUsageRuleItem(rule)
+		if item == "" {
+			continue
+		}
+		items = append(items, item)
+	}
+	return strings.Join(items, "\n\n")
+}
+
+func vulkanSpecIRDocFormatValidUsageRuleItem(rule string) string {
+	rule = vulkanSpecIRDocFormatValidUsageRuleNormalize(rule)
+	if rule == "" {
+		return ""
+	}
+
+	lines := strings.Split(rule, "\n")
+	if len(lines) == 1 {
+		line := strings.TrimSpace(lines[0])
+		if strings.HasPrefix(line, "- ") {
+			return line
+		}
+		return "- " + line
+	}
+
+	var b strings.Builder
+	b.WriteString(vulkanSpecIRDocFormatValidUsageBulletLine(lines[0]))
+	for _, line := range lines[1:] {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		b.WriteString("\n\n")
+		b.WriteString(vulkanSpecIRDocFormatValidUsageBulletLine(line))
+	}
+	return b.String()
+}
+
+func vulkanSpecIRDocFormatValidUsageBulletLine(line string) string {
+	line = strings.TrimSpace(line)
+	if strings.HasPrefix(line, "- ") {
+		return line
+	}
+	return "- " + line
+}
+
+/*
+vulkanSpecIRDocFormatValidUsageRuleNormalize merges HTML soft-wraps into one line per bullet while preserving explicit sub-bullets.
+*/
+func vulkanSpecIRDocFormatValidUsageRuleNormalize(rule string) string {
+	rule = strings.TrimSpace(rule)
+	if rule == "" {
+		return ""
+	}
+
+	lines := strings.Split(rule, "\n")
+	blocks := make([]string, 0, len(lines))
+	var current strings.Builder
+
+	flush := func() {
+		if current.Len() == 0 {
+			return
+		}
+		blocks = append(blocks, strings.TrimSpace(current.String()))
+		current.Reset()
+	}
+
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		if strings.HasPrefix(line, "- ") {
+			flush()
+			blocks = append(blocks, line)
+			continue
+		}
+		if len(blocks) > 0 && strings.HasPrefix(blocks[len(blocks)-1], "- ") {
+			blocks[len(blocks)-1] += " " + line
+			continue
+		}
+		if current.Len() > 0 {
+			current.WriteByte(' ')
+		}
+		current.WriteString(line)
+	}
+	flush()
+
+	if len(blocks) == 0 {
+		return ""
+	}
+	return strings.Join(blocks, "\n")
 }
 
 const vulkanSpecIRDocGeneratedLead = "is generated from the Khronos Vulkan registry."

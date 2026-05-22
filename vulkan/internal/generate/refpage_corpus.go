@@ -14,9 +14,11 @@ const vulkanRefpageFileSuffix = ".html"
 VulkanRefpageDoc is parsed Khronos registry man page prose for one API name.
 */
 type VulkanRefpageDoc struct {
-	Summary     string
-	Description string
-	Members     map[string]string
+	Summary            string
+	Description        string
+	ValidUsageExplicit []string
+	ValidUsageImplicit []string
+	Members            map[string]string
 }
 
 /*
@@ -45,6 +47,8 @@ func (corpus VulkanRefpageCorpus) Lookup(name string, aliasOf string) VulkanRefp
 func (doc VulkanRefpageDoc) IsEmpty() bool {
 	return strings.TrimSpace(doc.Summary) == "" &&
 		strings.TrimSpace(doc.Description) == "" &&
+		len(doc.ValidUsageExplicit) == 0 &&
+		len(doc.ValidUsageImplicit) == 0 &&
 		len(doc.Members) == 0
 }
 

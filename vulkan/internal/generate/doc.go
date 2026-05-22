@@ -5,7 +5,8 @@ Binding generation uses three documentation tiers:
 
   - Tier 1: <comment> attributes and child elements in vk.xml (short registry hints).
   - Tier 2: [Reference] links to https://registry.khronos.org/vulkan/specs/latest/man/html/.
-  - Tier 3: cached Khronos man page HTML under -refpageDir (default <specOutputDir>/refpages).
+  - Tier 3: cached Khronos man page HTML under -refpageDir (default <specOutputDir>/refpages). Struct types
+    include [Description], [Valid Usage], and [Valid Usage (Implicit)] from the refpage when present.
 
 Run with -bindingOutputDir and -specOutputDir. Man pages are fetched only when the spec or symbol set changes,
 pages are missing from the cache, or -refpageUpdate is set. Known registry 404s are recorded in refpages/manifest.json
