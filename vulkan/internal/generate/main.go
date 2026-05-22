@@ -13,48 +13,63 @@ const specDebug string = "vulkan_spec_debug.txt"
 func main() {
 	var specOutputDir string
 	var bindingOutputDir string
-	flag.StringVar(&specOutputDir, "specOutputDir", "", "download vk.xml from the Khronos registry and write it to this file path")
-	flag.StringVar(&bindingOutputDir, "bindingOutputDir", "", "render generated Vulkan command bindings to this Go file path")
+	flag.StringVar(&specOutputDir, "specOutputDir", "", "directory for vulkan_spec.xml (fetched when missing or when bindings are not requested)")
+	flag.StringVar(&bindingOutputDir, "bindingOutputDir", "", "directory for generated Vulkan bindings (reuses existing spec when present)")
 	flag.Parse()
 
-	if specOutputDir != "" {
-		if bindingOutputDir != "" {
-			fmt.Println("skipping binding output generation for now as it is not yet implemented")
-			return
+	if specOutputDir == "" && bindingOutputDir == "" {
+		panic("gpuarch generate: provide -specOutputDir and/or -bindingOutputDir")
+	}
+
+	if bindingOutputDir != "" {
+		if specOutputDir == "" {
+			panic("gpuarch generate: -bindingOutputDir requires -specOutputDir")
 		}
-
-		specOutputDirAbs, err := filepath.Abs(specOutputDir)
-		if err != nil {
-			panic(fmt.Errorf("resolve spec output path: %w", err))
-		}
-
-		system.DirCreate(specOutputDirAbs, true)
-
-		specOutputFile := system.PathJoin(specOutputDirAbs, specName)
-		specDebugOutputFile := system.PathJoin(specOutputDirAbs, specDebug)
-
-		content, err := vulkanRegistrySpecFetch(VulkanRegistrySpecURL)
-		if err != nil {
-			panic(err)
-		}
-
-		if err := system.FileWriteBytes(specOutputFile, content); err != nil {
-			panic(fmt.Errorf("write Vulkan registry spec to %s: %w", specOutputFile, err))
-		}
-
-		root, err := xmlSpecTreeParse(content)
-		if err != nil {
-			panic(err)
-		}
-
-		if err := vulkanRegistrySpecDebugTreeWrite(specOutputFile, specDebugOutputFile, root, xmlSpecTreeDebugDefaultOptions()); err != nil {
-			panic(err)
-		}
-
-		fmt.Printf("Fetched Vulkan registry spec to %s\n", specOutputFile)
-		fmt.Printf("Wrote Vulkan registry debug tree to %s\n", specDebugOutputFile)
+		runBindingGeneration(specOutputDir, bindingOutputDir)
 		return
 	}
 
-	panic("vulkangen: provide -specOutputDir, or -bindingOutputDir")
+	runSpecFetch(specOutputDir)
+}
+
+func runSpecFetch(specOutputDir string) {
+	paths, err := vulkanRegistrySpecPathsResolve(specOutputDir)
+	if err != nil {
+		panic(err)
+	}
+
+	system.DirCreate(filepath.Dir(paths.SpecFile), true)
+
+	if _, err := vulkanRegistrySpecFetchWriteAndDebug(paths); err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("Fetched Vulkan registry spec to %s\n", paths.SpecFile)
+	fmt.Printf("Wrote Vulkan registry debug tree to %s\n", paths.DebugFile)
+}
+
+func runBindingGeneration(specOutputDir string, bindingOutputDir string) {
+	_, err := filepath.Abs(bindingOutputDir)
+	if err != nil {
+		panic(fmt.Errorf("resolve binding output path: %w", err))
+	}
+
+	root, loadedExisting, err := vulkanRegistrySpecEnsure(specOutputDir)
+	if err != nil {
+		panic(err)
+	}
+
+	paths, err := vulkanRegistrySpecPathsResolve(specOutputDir)
+	if err != nil {
+		panic(err)
+	}
+
+	if loadedExisting {
+		fmt.Printf("Using existing Vulkan registry spec at %s\n", paths.SpecFile)
+	} else {
+		fmt.Printf("Fetched Vulkan registry spec to %s\n", paths.SpecFile)
+		fmt.Printf("Wrote Vulkan registry debug tree to %s\n", paths.DebugFile)
+	}
+
+	vulkanBindingEnumTypeNamesPrint(root)
 }
