@@ -55,10 +55,11 @@ func runSpecFetch(specOutputDir string) {
 }
 
 func runBindingGeneration(specOutputDir string, bindingOutputDir string, refpageDir string, refpageSkipFetch bool, refpageUpdate bool) {
-	_, err := filepath.Abs(bindingOutputDir)
+	bindingOutputAbs, err := filepath.Abs(bindingOutputDir)
 	if err != nil {
 		panic(fmt.Errorf("resolve binding output path: %w", err))
 	}
+	system.DirCreate(bindingOutputAbs, true)
 
 	root, loadedExisting, err := vulkanRegistrySpecEnsure(specOutputDir)
 	if err != nil {

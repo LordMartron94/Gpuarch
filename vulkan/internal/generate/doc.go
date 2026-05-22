@@ -19,6 +19,6 @@ Example:
 
 	go run ./libs/gpuarch/vulkan/internal/generate \
 	  -specOutputDir=./libs/gpuarch/vulkan/internal/spec \
-	  -bindingOutputDir=./libs/gpuarch/vulkan/internal/bindings
+	  -bindingOutputDir=./libs/gpuarch/vulkan/bindings
 */
 package main
