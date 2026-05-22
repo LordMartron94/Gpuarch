@@ -72,5 +72,8 @@ func runBindingGeneration(specOutputDir string, bindingOutputDir string) {
 	}
 
 	ir := vulkanSpecIRBuild(root)
-	vulkanBindingSpecIRPrint(ir)
+
+	if err := specToBindingsConvert(ir, bindingOutputDir); err != nil {
+		panic(err)
+	}
 }
