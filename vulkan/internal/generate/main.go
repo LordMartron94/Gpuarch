@@ -71,5 +71,6 @@ func runBindingGeneration(specOutputDir string, bindingOutputDir string) {
 		fmt.Printf("Wrote Vulkan registry debug tree to %s\n", paths.DebugFile)
 	}
 
-	vulkanBindingEnumTypeNamesPrint(root)
+	ir := vulkanSpecIRBuild(root)
+	vulkanBindingSpecIRPrint(ir)
 }

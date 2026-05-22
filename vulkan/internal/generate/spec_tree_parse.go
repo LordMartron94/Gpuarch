@@ -94,6 +94,21 @@ func xmlSpecTreeParse(content []byte) (*xmlSpecNode, error) {
 	return root, nil
 }
 
+/*
+xmlSpecNodeAttrValue returns the value of attrName on node, or an empty string when absent.
+*/
+func xmlSpecNodeAttrValue(node *xmlSpecNode, attrName string) string {
+	if node == nil {
+		return ""
+	}
+	for _, attr := range node.Attrs {
+		if attr.Name == attrName {
+			return attr.Value
+		}
+	}
+	return ""
+}
+
 func xmlSpecAttrsFromXML(attrs []xml.Attr) []xmlSpecAttr {
 	if len(attrs) == 0 {
 		return nil
