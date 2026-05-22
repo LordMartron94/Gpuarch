@@ -13,17 +13,27 @@ Go library for GPU-facing architecture: Vulkan registry bindings, ICD loading, a
 
 The API stays generic and registry-faithful so higher-level engines can wrap or curate it without fighting domain assumptions baked into the bindings.
 
+## Disclaimer
+
+While this library is maintained by its developer and used in real projects, **most of `gpuarch` is generated code produced with Cursor AI assistance** (Vulkan bindings, loader holders, registry tables, and related `*_gen.go` artifacts). It is **not guaranteed to be correct or complete**, even though bugs and crashes encountered in use are typically fixed and pushed when found.
+
+Treat generated surfaces as best-effort registry mirrors: validate behavior against the Vulkan spec, validation layers, and your target hardware. Hand-written packages (`dto`, `result`, and generator tooling) receive the same scrutiny but are still evolving.
+
 ## Requirements
 
 - Go 1.25+
 - Vulkan loader and ICD installed on the host (platform-specific)
-- This repository and its dependencies obtained **from source** (not published on a module proxy)
+- All modules in the import graph available to the Go toolchain (see [Dependencies](#dependencies))
 
 Generated bindings and loader sources are committed in this tree; you normally do not run the generator unless you are updating the registry snapshot.
 
 ## Obtaining the source
 
-`gpuarch` is not distributed as a versioned Go module on a proxy. Clone the repository into your project, typically as a **git submodule** so the revision stays pinned with the rest of your tree:
+You can consume `gpuarch` in two ways: **clone into the tree** (submodule or vendor) or **import by module path** when the repository is reachable from your module proxy or VCS (for example GitHub). Both approaches require the same companion libraries; `gpuarch` does not stand alone.
+
+### Submodule or local clone (recommended for pinning)
+
+Clone the repository into your project, typically as a **git submodule** so the revision stays pinned with the rest of your tree:
 
 ```bash
 git submodule add <gpuarch-repository-url> third_party/gpuarch
@@ -32,7 +42,41 @@ git submodule update --init third_party/gpuarch
 
 Use whatever URL and path match your hosting layout. The module path in `go.mod` is `gpuarch`; your `go.work` or `replace` directives must point at the cloned directory.
 
-The same applies to every dependency from this architecture: **syscore**, **memstruct**, **memcore**, **foundation**, **codegen**, and any others your import graph pulls in. Add each repository as its own submodule (or equivalent vendored clone), then wire them locally—do not expect `go get` to resolve them.
+The same applies to every dependency from this architecture (see [Dependencies](#dependencies)): add each repository as its own submodule (or equivalent vendored clone), then wire them locally.
+
+### Standard Go imports (GitHub or other VCS)
+
+When the published `go.mod` uses a fully qualified module path, you can import packages with normal Go import statements, for example:
+
+```go
+import (
+    "github.com/LordMartron94/gpuarch/vulkan/bindings"
+    "github.com/LordMartron94/gpuarch/vulkan/loader"
+    "github.com/LordMartron94/gpuarch/vulkan/result"
+)
+```
+
+Add the module to your project:
+
+```bash
+go get github.com/LordMartron94/gpuarch@<version>
+```
+
+Replace the org, repository name, and version with whatever matches the remote you use. If the upstream `go.mod` still declares `module gpuarch` (short path), either import with `gpuarch/vulkan/...` and satisfy that path via `go.work` / `replace`, or align the remote module path with the GitHub URL before relying on `go get` alone.
+
+**You must also make every dependency module resolvable.** Importing `gpuarch/vulkan/loader` alone is not enough: the build will pull in **syscore** (always), and **memcore** / **memstruct** if you use `dto`. Each of those modules must be present in your `go.work`, vendored tree, or available at its own import path with matching `go get` / `replace` entries. Missing a sibling module produces unresolved-import errors even when `gpuarch` itself resolves.
+
+Example `go.mod` fragment when everything is on GitHub under the same org:
+
+```go
+require (
+    github.com/LordMartron94/gpuarch v0.0.0
+    github.com/LordMartron94/syscore v0.0.0
+    // github.com/LordMartron94/memcore, memstruct — when using dto
+)
+```
+
+Use `replace` directives during local development if you clone siblings side by side instead of tagging releases.
 
 ### Dependencies
 
@@ -59,7 +103,7 @@ use (
 )
 ```
 
-Adjust paths to match where your submodules live. With `use` entries in place, `import "gpuarch/vulkan/loader"` resolves to the local clone without proxy fetch.
+Adjust paths to match where your submodules live. With `use` entries in place, `import "gpuarch/vulkan/loader"` (or the fully qualified GitHub path, if that is what the remote `go.mod` declares) resolves to the local clone without proxy fetch.
 
 Example submodule layout:
 
@@ -98,6 +142,8 @@ gpuarch/
 | `gpuarch/vulkan/loader` | `VulkanModuleLoad`, command holders, manifest loading |
 | `gpuarch/vulkan/dto` | `memstruct.Array` bind/load, `pNext` chain helpers |
 | `gpuarch/vulkan/result` | VkResult classification, assert helpers, `error` conversion |
+
+When the remote module path is fully qualified, prefix the same suffixes with your VCS root (for example `github.com/LordMartron94/gpuarch/vulkan/loader`).
 
 Do not import `gpuarch/vulkan/internal/...` from application code.
 
