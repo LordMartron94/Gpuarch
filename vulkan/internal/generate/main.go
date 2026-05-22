@@ -78,4 +78,5 @@ func runBindingGeneration(specOutputDir string, bindingOutputDir string) {
 	}
 
 	fmt.Printf("Wrote Vulkan bindings to %s\n", bindingOutputDir)
+	fmt.Printf("Formatted Vulkan bindings with gofmt\n")
 }

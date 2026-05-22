@@ -5,6 +5,7 @@ import (
 	gocode "codegen/go"
 	"fmt"
 	"foundation/system"
+	"os/exec"
 	"time"
 )
 
@@ -33,6 +34,18 @@ func specToBindingsConvert(ir VulkanSpecIR, bindingsDir string) error {
 	}
 	if err := generateHandlesContent(ir.Handles, bindingsDir); err != nil {
 		return err
+	}
+	return vulkanBindingsFormat(bindingsDir)
+}
+
+/*
+vulkanBindingsFormat runs gofmt on all generated Go files in bindingsDir.
+*/
+func vulkanBindingsFormat(bindingsDir string) error {
+	cmd := exec.Command("gofmt", "-w", bindingsDir)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("gofmt %s: %w\n%s", bindingsDir, err, output)
 	}
 	return nil
 }
