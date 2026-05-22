@@ -43,6 +43,9 @@ func specToBindingsConvert(ir VulkanSpecIR, bindingsDir string, corpus VulkanRef
 	if err := generateStructsContent(ir.Structs, bindingsDir, corpus); err != nil {
 		return err
 	}
+	if err := generateRegistryContent(ir, bindingsDir, corpus); err != nil {
+		return err
+	}
 	return vulkanBindingsFormat(bindingsDir)
 }
 
@@ -96,7 +99,6 @@ func vulkanSpecIRStructBindingElements(aggregate VulkanSpecIRStruct, corpus Vulk
 	}
 
 	fields := make([]gocode.StructFieldDecl, 0, len(aggregate.Fields))
-	fieldIndex := 0
 	for _, field := range aggregate.Fields {
 		if field.Name == "" || field.GoType == "" {
 			continue
@@ -113,17 +115,11 @@ func vulkanSpecIRStructBindingElements(aggregate VulkanSpecIRStruct, corpus Vulk
 			field.VulkanMemberName,
 		)
 		formattedDoc := vulkanSpecIRDocFormatStructField(field.Name, fieldDoc)
-		var leading []codegen.Node
-		if fieldIndex > 0 && formattedDoc != "" {
-			leading = append(leading, gocode.LayoutBlankLineNode())
-		}
 		fields = append(fields, gocode.StructFieldTypeDoc(
 			field.Name,
 			typ,
 			formattedDoc,
-			leading...,
 		))
-		fieldIndex++
 	}
 
 	elements := make([]codegen.FileElement, 0, 2)

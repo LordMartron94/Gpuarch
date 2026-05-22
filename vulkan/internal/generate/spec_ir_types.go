@@ -13,6 +13,9 @@ type VulkanSpecIR struct {
 	Funcpointers []VulkanSpecIRFuncpointer
 	Handles      []VulkanSpecIRHandle
 	Structs      []VulkanSpecIRStruct
+	ApiVersions  []VulkanSpecIRApiVersion
+	Extensions   []VulkanSpecIRExtension
+	Features     []VulkanSpecIRFeature
 }
 
 /*
