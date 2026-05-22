@@ -26,6 +26,9 @@ func specToLoaderConvert(ir VulkanSpecIR, loaderDir string, corpus VulkanRefpage
 	if err := generateLoaderCommandsContent(ir.Commands, loaderDir, corpus); err != nil {
 		return err
 	}
+	if err := generateLoaderManifestContent(ir.Commands, loaderDir); err != nil {
+		return err
+	}
 	return vulkanLoaderFormat(loaderDir)
 }
 
