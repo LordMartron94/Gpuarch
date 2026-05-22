@@ -9,6 +9,7 @@ Go library for GPU-facing architecture: Vulkan registry bindings, ICD loading, a
 - Types and constants generated from the official Khronos `vk.xml` registry
 - Runtime resolution of Vulkan entry points from the platform ICD
 - Optional DTO helpers for `memstruct.Array` and `pNext` chains
+- Optional VkResult assertion helpers and Go error conversion
 
 The API stays generic and registry-faithful so higher-level engines can wrap or curate it without fighting domain assumptions baked into the bindings.
 
@@ -85,6 +86,7 @@ gpuarch/
     ├── bindings/          # generated: types, PFNs, VkRegistry* tables
     ├── loader/            # generated holders + ICD module + manifest
     ├── dto/               # Array ↔ Vulkan, pNext chain helpers
+    ├── result/            # VkResult assert + error conversion
     └── internal/
         ├── generate/      # vk.xml + refpage → bindings + loader
         └── spec/          # cached vulkan_spec.xml and man-page HTML
@@ -95,6 +97,7 @@ gpuarch/
 | `gpuarch/vulkan/bindings` | Generated Vulkan types and registry tables |
 | `gpuarch/vulkan/loader` | `VulkanModuleLoad`, command holders, manifest loading |
 | `gpuarch/vulkan/dto` | `memstruct.Array` bind/load, `pNext` chain helpers |
+| `gpuarch/vulkan/result` | VkResult classification, assert helpers, `error` conversion |
 
 Do not import `gpuarch/vulkan/internal/...` from application code.
 
@@ -105,6 +108,7 @@ Do not import `gpuarch/vulkan/internal/...` from application code.
 - Vulkan 1:1 bindings (structs, enums, flags, handles, PFN types, registry metadata)
 - Loader holders and selective command loading via a runtime manifest
 - Ergonomic bridges to `memstruct.Array` for counted lists and extension chains
+- VkResult helpers: strict success checks, allowed status codes, failure-only errors
 
 **Out of scope (today)**
 
@@ -173,6 +177,33 @@ dto.VulkanArrayBindU32(&info.EnabledExtensionCount, &info.PPEnabledExtensionName
 dto.VulkanArrayLoadU32(count, first, into)
 ```
 
+## Using result (optional)
+
+Import `gpuarch/vulkan/result` after Vulkan calls that return `bindings.VkResult`:
+
+```go
+import (
+    "gpuarch/vulkan/bindings"
+    "gpuarch/vulkan/result"
+)
+
+if err := result.VulkanResultAssertSuccess(vkCreateInstance(...)); err != nil {
+    return err
+}
+
+// Enumeration may return VK_INCOMPLETE:
+if err := result.VulkanResultAssertSuccessOr(r, bindings.VK_INCOMPLETE); err != nil {
+    return err
+}
+
+// Map to standard Go errors:
+if err := result.VulkanResultToErrorIfFailure(r); err != nil {
+    return err
+}
+```
+
+`VulkanResultToError` treats any non-`VK_SUCCESS` value as an error (including `VK_NOT_READY`). `VulkanResultToErrorIfFailure` only errors on negative failure codes.
+
 **pNext chains**
 
 ```go
@@ -205,7 +236,7 @@ Run from the `gpuarch` module root (directory containing `go.mod`):
 go run ./vulkan/internal/generate \
   -specOutputDir=./vulkan/internal/spec
 
-# Full generation (bindings + loader + manifest); offline refpage cache
+# Full generation (bindings + result names + loader + manifest); offline refpage cache
 go run ./vulkan/internal/generate \
   -specOutputDir=./vulkan/internal/spec \
   -bindingOutputDir=./vulkan/bindings \
@@ -215,7 +246,7 @@ go run ./vulkan/internal/generate \
 | Flag | Purpose |
 |------|---------|
 | `-specOutputDir` | Directory for `vulkan_spec.xml` and refpage cache |
-| `-bindingOutputDir` | Output for `bindings/*.go`; loader is written to `vulkan/loader/` |
+| `-bindingOutputDir` | Output for `bindings/*.go`; `result/` and `loader/` are written beside it under `vulkan/` |
 | `-refpageDir` | Man-page HTML cache (default: `<specOutputDir>/refpages`) |
 | `-refpageSkipFetch` | Use cache only (no network) |
 | `-refpageUpdate` | Re-fetch stale man pages |

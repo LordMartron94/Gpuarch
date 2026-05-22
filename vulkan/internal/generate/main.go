@@ -103,6 +103,12 @@ func runBindingGeneration(specOutputDir string, bindingOutputDir string, refpage
 		panic(err)
 	}
 
+	resultOutputDir := system.PathJoin(system.PathDir(bindingOutputAbs), "result")
+	system.DirCreate(resultOutputDir, true)
+	if err := generateResultContent(ir.Enums, resultOutputDir); err != nil {
+		panic(err)
+	}
+
 	loaderOutputDir := system.PathJoin(system.PathDir(bindingOutputAbs), "loader")
 	system.DirCreate(loaderOutputDir, true)
 	if err := specToLoaderConvert(ir, loaderOutputDir, corpus); err != nil {
@@ -110,6 +116,7 @@ func runBindingGeneration(specOutputDir string, bindingOutputDir string, refpage
 	}
 
 	fmt.Printf("Wrote Vulkan bindings to %s\n", bindingOutputDir)
+	fmt.Printf("Wrote Vulkan result helpers to %s\n", resultOutputDir)
 	fmt.Printf("Wrote Vulkan loader to %s\n", loaderOutputDir)
-	fmt.Printf("Formatted Vulkan bindings and loader with gofmt\n")
+	fmt.Printf("Formatted Vulkan bindings, result, and loader with gofmt\n")
 }
