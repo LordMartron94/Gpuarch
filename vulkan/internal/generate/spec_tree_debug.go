@@ -1,11 +1,8 @@
 package main
 
 import (
-	"bytes"
-	"encoding/xml"
 	"fmt"
 	"foundation/system"
-	"io"
 	"path/filepath"
 	"strings"
 )
@@ -16,131 +13,38 @@ const (
 )
 
 /*
-xmlSpecAttr is one attribute on an XML element in the Vulkan registry tree.
+xmlSpecTreeDebugOptions controls how much of a large registry document is expanded in debug output.
 */
-type xmlSpecAttr struct {
-	Name  string
-	Value string
-}
-
-/*
-xmlSpecNode is a node in the registry XML tree built by encoding/xml token decoding.
-*/
-type xmlSpecNode struct {
-	Name     string
-	Attrs    []xmlSpecAttr
-	Children []*xmlSpecNode
-	Text     string
-}
-
-/*
-xmlSpecTreeParseOptions controls how much of a large registry document is expanded in debug output.
-*/
-type xmlSpecTreeParseOptions struct {
+type xmlSpecTreeDebugOptions struct {
 	MaxChildrenListed uint64
 	MaxTextRunes      int
 }
 
 /*
-xmlSpecTreeDefaultOptions returns limits suited to vk.xml debug dumps.
+xmlSpecTreeDebugDefaultOptions returns limits suited to vk.xml debug dumps.
 */
-func xmlSpecTreeDefaultOptions() xmlSpecTreeParseOptions {
-	return xmlSpecTreeParseOptions{
+func xmlSpecTreeDebugDefaultOptions() xmlSpecTreeDebugOptions {
+	return xmlSpecTreeDebugOptions{
 		MaxChildrenListed: xmlSpecDebugMaxChildrenListed,
 		MaxTextRunes:      xmlSpecDebugMaxTextRunes,
 	}
 }
 
 /*
-xmlSpecTreeParse builds a document tree from raw registry XML using encoding/xml.
+xmlSpecTreeDebugRender formats a parsed registry tree and a short structural summary for human inspection.
 
 [Parameters]
-content is the full vk.xml bytes. No Vulkan-specific interpretation is applied.
+sourcePath labels the registry XML in the dump header. outputPath labels the debug file path in the header.
+root is the parsed tree from xmlSpecTreeParse or vulkanRegistrySpecTreeLoadFromFile.
 
 [Returns]
-The root element node and nil error on success.
+A multi-line text dump. Does not mutate root.
 */
-func xmlSpecTreeParse(content []byte) (*xmlSpecNode, error) {
-	decoder := xml.NewDecoder(bytes.NewReader(content))
-
-	var stack []*xmlSpecNode
-	var root *xmlSpecNode
-
-	for {
-		token, err := decoder.Token()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return nil, fmt.Errorf("decode Vulkan registry XML: %w", err)
-		}
-
-		switch element := token.(type) {
-		case xml.StartElement:
-			node := &xmlSpecNode{
-				Name:  element.Name.Local,
-				Attrs: xmlSpecAttrsFromXML(element.Attr),
-			}
-			if len(stack) == 0 {
-				root = node
-			} else {
-				parent := stack[len(stack)-1]
-				parent.Children = append(parent.Children, node)
-			}
-			stack = append(stack, node)
-
-		case xml.EndElement:
-			if len(stack) == 0 {
-				return nil, fmt.Errorf("decode Vulkan registry XML: unexpected end element </%s>", element.Name.Local)
-			}
-			stack = stack[:len(stack)-1]
-
-		case xml.CharData:
-			if len(stack) == 0 {
-				continue
-			}
-			text := strings.TrimSpace(string(element))
-			if text == "" {
-				continue
-			}
-			current := stack[len(stack)-1]
-			if current.Text == "" {
-				current.Text = text
-			} else {
-				current.Text += " " + text
-			}
-		}
-	}
-
-	if root == nil {
-		return nil, fmt.Errorf("decode Vulkan registry XML: document has no root element")
-	}
-
-	return root, nil
-}
-
-func xmlSpecAttrsFromXML(attrs []xml.Attr) []xmlSpecAttr {
-	if len(attrs) == 0 {
-		return nil
-	}
-	out := make([]xmlSpecAttr, len(attrs))
-	for i, attr := range attrs {
-		out[i] = xmlSpecAttr{
-			Name:  attr.Name.Local,
-			Value: attr.Value,
-		}
-	}
-	return out
-}
-
-/*
-xmlSpecTreeDebugRender formats the parsed registry tree and a short structural summary for human inspection.
-*/
-func xmlSpecTreeDebugRender(specXMLPath string, outputPath string, root *xmlSpecNode, options xmlSpecTreeParseOptions) string {
+func xmlSpecTreeDebugRender(sourcePath string, outputPath string, root *xmlSpecNode, options xmlSpecTreeDebugOptions) string {
 	var builder strings.Builder
 
 	builder.WriteString("Vulkan Registry XML tree (debug)\n")
-	builder.WriteString(fmt.Sprintf("Source: %s\n", specXMLPath))
+	builder.WriteString(fmt.Sprintf("Source: %s\n", sourcePath))
 	builder.WriteString(fmt.Sprintf("Debug output: %s\n", outputPath))
 	builder.WriteString("\n")
 	builder.WriteString("=== Registry summary (depth-1 sections) ===\n")
@@ -151,6 +55,60 @@ func xmlSpecTreeDebugRender(specXMLPath string, outputPath string, root *xmlSpec
 	builder.WriteString("\n")
 
 	return builder.String()
+}
+
+/*
+vulkanRegistrySpecDebugTreeWrite renders a parsed registry tree and writes it to outputPath.
+
+[Parameters]
+sourcePath labels the registry XML in the dump header. outputPath is the destination .txt file.
+root must be non-nil.
+
+[Returns]
+nil on success. An error when render or write fails.
+
+[Side Effects]
+Overwrites outputPath when it already exists.
+*/
+func vulkanRegistrySpecDebugTreeWrite(sourcePath string, outputPath string, root *xmlSpecNode, options xmlSpecTreeDebugOptions) error {
+	absSourcePath, err := filepath.Abs(sourcePath)
+	if err != nil {
+		return fmt.Errorf("resolve spec XML path: %w", err)
+	}
+
+	absOutputPath, err := filepath.Abs(outputPath)
+	if err != nil {
+		return fmt.Errorf("resolve debug tree output path: %w", err)
+	}
+
+	rendered := xmlSpecTreeDebugRender(absSourcePath, absOutputPath, root, options)
+
+	if err := system.FileWriteString(absOutputPath, rendered); err != nil {
+		return fmt.Errorf("write Vulkan registry debug tree to %s: %w", absOutputPath, err)
+	}
+
+	return nil
+}
+
+/*
+vulkanRegistrySpecWriteDebugTree reads registry XML from specXMLPath, parses it, and writes a debug tree dump to outputPath.
+
+[Parameters]
+specXMLPath must point to an existing vk.xml file. outputPath is the destination .txt file.
+
+[Returns]
+nil on success. An error when read, parse, or write fails.
+
+[Side Effects]
+Reads specXMLPath and overwrites outputPath when it already exists.
+*/
+func vulkanRegistrySpecWriteDebugTree(specXMLPath string, outputPath string) error {
+	_, root, err := vulkanRegistrySpecTreeLoadFromFile(specXMLPath)
+	if err != nil {
+		return err
+	}
+
+	return vulkanRegistrySpecDebugTreeWrite(specXMLPath, outputPath, root, xmlSpecTreeDebugDefaultOptions())
 }
 
 func xmlSpecTreeSummaryWrite(builder *strings.Builder, root *xmlSpecNode) {
@@ -174,7 +132,7 @@ func xmlSpecTreeSummaryWrite(builder *strings.Builder, root *xmlSpecNode) {
 	}
 }
 
-func xmlSpecTreeNodeWrite(builder *strings.Builder, node *xmlSpecNode, depth int, options xmlSpecTreeParseOptions) {
+func xmlSpecTreeNodeWrite(builder *strings.Builder, node *xmlSpecNode, depth int, options xmlSpecTreeDebugOptions) {
 	if node == nil {
 		return
 	}
@@ -232,38 +190,4 @@ func xmlSpecTextTruncate(text string, maxRunes int) string {
 		return text
 	}
 	return string(runes[:maxRunes]) + "..."
-}
-
-/*
-vulkanRegistrySpecWriteDebugTree reads registry XML from specXMLPath, parses it with encoding/xml, and writes a sibling .txt tree dump.
-
-[Parameters]
-specXMLPath must point to an existing vk.xml file. Output is written next to it with the same basename and a .txt extension.
-
-[Returns]
-nil on success. An error when read, parse, or write fails.
-*/
-func vulkanRegistrySpecWriteDebugTree(specXMLPath string, outputPath string) error {
-	absXMLPath, err := filepath.Abs(specXMLPath)
-	if err != nil {
-		return fmt.Errorf("resolve spec XML path: %w", err)
-	}
-
-	content, err := system.FileReadAllBytes(absXMLPath)
-	if err != nil {
-		return fmt.Errorf("read Vulkan registry spec at %s: %w", absXMLPath, err)
-	}
-
-	root, err := xmlSpecTreeParse(content)
-	if err != nil {
-		return err
-	}
-
-	rendered := xmlSpecTreeDebugRender(absXMLPath, outputPath, root, xmlSpecTreeDefaultOptions())
-
-	if err := system.FileWriteString(outputPath, rendered); err != nil {
-		return fmt.Errorf("write Vulkan registry debug tree to %s: %w", outputPath, err)
-	}
-
-	return nil
 }

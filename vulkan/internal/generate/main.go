@@ -33,11 +33,21 @@ func main() {
 		specOutputFile := system.PathJoin(specOutputDirAbs, specName)
 		specDebugOutputFile := system.PathJoin(specOutputDirAbs, specDebug)
 
-		if err := vulkanRegistrySpecWriteToFile(specOutputFile); err != nil {
+		content, err := vulkanRegistrySpecFetch(VulkanRegistrySpecURL)
+		if err != nil {
 			panic(err)
 		}
 
-		if err := vulkanRegistrySpecWriteDebugTree(specOutputFile, specDebugOutputFile); err != nil {
+		if err := system.FileWriteBytes(specOutputFile, content); err != nil {
+			panic(fmt.Errorf("write Vulkan registry spec to %s: %w", specOutputFile, err))
+		}
+
+		root, err := xmlSpecTreeParse(content)
+		if err != nil {
+			panic(err)
+		}
+
+		if err := vulkanRegistrySpecDebugTreeWrite(specOutputFile, specDebugOutputFile, root, xmlSpecTreeDebugDefaultOptions()); err != nil {
 			panic(err)
 		}
 
