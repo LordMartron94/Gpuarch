@@ -114,8 +114,9 @@ func vulkanSpecIRDocCompose(
 			parts = append(parts, "[Valid Usage (Implicit)]\n\n"+usage)
 		}
 	} else {
-		if memberDoc := strings.TrimSpace(refpage.Members[memberCName]); memberDoc != "" {
-			parts = append(parts, memberDoc)
+		member := refpage.Members[memberCName]
+		if summary := strings.TrimSpace(member.Summary); summary != "" {
+			parts = append(parts, summary)
 		}
 		if xmlDoc != "" {
 			if len(parts) == 0 {
@@ -123,6 +124,12 @@ func vulkanSpecIRDocCompose(
 			} else if !strings.Contains(parts[0], xmlDoc) {
 				parts = append(parts, xmlDoc)
 			}
+		}
+		if usage := vulkanSpecIRDocFormatValidUsageRules(member.ValidUsageExplicit); usage != "" {
+			parts = append(parts, "[Valid Usage]\n\n"+usage)
+		}
+		if usage := vulkanSpecIRDocFormatValidUsageRules(member.ValidUsageImplicit); usage != "" {
+			parts = append(parts, "[Valid Usage (Implicit)]\n\n"+usage)
 		}
 	}
 

@@ -1,7 +1,8 @@
 {
   "specSHA256": "50e66c781e8afb9c80ffae10e3f7579f71afae6f9e77f22d50eeb963b3939482",
-  "symbolSetHash": "ad267e39728ee238071b39e82db4b1b4722b3e679b613553a72199f3a3a7aca5",
+  "symbolSetHash": "78b9b044dddc3dbec52855ba0fd09f35ab4f77455b1b274d0ec931a7a388d507",
   "notFound": {
+    "PFN_vkFaultCallbackFunction": true,
     "VK_ACCELERATION_STRUCTURE_BUILD_TYPE_DEVICE_KHR": true,
     "VK_ACCELERATION_STRUCTURE_BUILD_TYPE_HOST_KHR": true,
     "VK_ACCELERATION_STRUCTURE_BUILD_TYPE_HOST_OR_DEVICE_KHR": true,
@@ -4776,5 +4777,47 @@
     "VkXcbSurfaceCreateFlagsKHRFlagBits": true,
     "VkXlibSurfaceCreateFlagsKHRFlagBits": true
   },
-  "updatedAt": "2026-05-22T19:37:19.509892108Z"
+  "entries": {
+    "PFN_vkAllocationFunction": {
+      "lastModified": "Fri, 15 May 2026 03:15:22 GMT",
+      "cachedAt": "2026-05-22T19:59:24.557581677Z"
+    },
+    "PFN_vkDebugReportCallbackEXT": {
+      "lastModified": "Fri, 15 May 2026 03:15:22 GMT",
+      "cachedAt": "2026-05-22T19:59:24.704180304Z"
+    },
+    "PFN_vkDebugUtilsMessengerCallbackEXT": {
+      "lastModified": "Fri, 15 May 2026 03:15:22 GMT",
+      "cachedAt": "2026-05-22T19:59:24.587739078Z"
+    },
+    "PFN_vkDeviceMemoryReportCallbackEXT": {
+      "lastModified": "Fri, 15 May 2026 03:15:22 GMT",
+      "cachedAt": "2026-05-22T19:59:24.548128144Z"
+    },
+    "PFN_vkFreeFunction": {
+      "lastModified": "Fri, 15 May 2026 03:15:22 GMT",
+      "cachedAt": "2026-05-22T19:59:24.563272164Z"
+    },
+    "PFN_vkGetInstanceProcAddrLUNARG": {
+      "lastModified": "Fri, 15 May 2026 03:15:22 GMT",
+      "cachedAt": "2026-05-22T19:59:24.562193229Z"
+    },
+    "PFN_vkInternalAllocationNotification": {
+      "lastModified": "Fri, 15 May 2026 03:15:22 GMT",
+      "cachedAt": "2026-05-22T19:59:24.559771864Z"
+    },
+    "PFN_vkInternalFreeNotification": {
+      "lastModified": "Fri, 15 May 2026 03:15:22 GMT",
+      "cachedAt": "2026-05-22T19:59:24.688765003Z"
+    },
+    "PFN_vkReallocationFunction": {
+      "lastModified": "Fri, 15 May 2026 03:15:22 GMT",
+      "cachedAt": "2026-05-22T19:59:24.688604277Z"
+    },
+    "PFN_vkVoidFunction": {
+      "lastModified": "Fri, 15 May 2026 03:15:22 GMT",
+      "cachedAt": "2026-05-22T19:59:24.687279584Z"
+    }
+  },
+  "updatedAt": "2026-05-22T19:59:24.704194204Z"
 }

@@ -6,12 +6,13 @@ VulkanSpecIR is the intermediate representation of a parsed Vulkan registry docu
 Additional registry constructs will be added here as binding generation grows.
 */
 type VulkanSpecIR struct {
-	Basetypes []VulkanSpecIRBasetype
-	Constants VulkanSpecIRConstants
-	Enums     []VulkanSpecIREnum
-	Flags     []VulkanSpecIRFlags
-	Handles   []VulkanSpecIRHandle
-	Structs   []VulkanSpecIRStruct
+	Basetypes    []VulkanSpecIRBasetype
+	Constants    VulkanSpecIRConstants
+	Enums        []VulkanSpecIREnum
+	Flags        []VulkanSpecIRFlags
+	Funcpointers []VulkanSpecIRFuncpointer
+	Handles      []VulkanSpecIRHandle
+	Structs      []VulkanSpecIRStruct
 }
 
 /*
@@ -129,4 +130,24 @@ type VulkanSpecIRFlagsValue struct {
 	Key    string
 	Value  string
 	XMLDoc string
+}
+
+/*
+VulkanSpecIRFuncpointerParam is one parameter on a registry funcpointer type.
+*/
+type VulkanSpecIRFuncpointerParam struct {
+	Name        string
+	GoType      string
+	NeedsUnsafe bool
+}
+
+/*
+VulkanSpecIRFuncpointer is one Vulkan function pointer type from <type category="funcpointer">.
+*/
+type VulkanSpecIRFuncpointer struct {
+	Name          string
+	ReturnGoType  string
+	ReturnsUnsafe bool
+	Params        []VulkanSpecIRFuncpointerParam
+	XMLDoc        string
 }

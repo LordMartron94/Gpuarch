@@ -226,6 +226,10 @@ func vulkanSpecIRMemberCTypeGo(cType string) (string, bool) {
 		return cType, true
 	}
 
+	if strings.HasPrefix(cType, "PFN_") {
+		return cType, true
+	}
+
 	return "", false
 }
 

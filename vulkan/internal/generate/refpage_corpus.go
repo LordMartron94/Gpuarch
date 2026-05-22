@@ -11,6 +11,21 @@ import (
 const vulkanRefpageFileSuffix = ".html"
 
 /*
+VulkanRefpageMemberDoc is parsed Khronos man page prose for one struct or union member.
+*/
+type VulkanRefpageMemberDoc struct {
+	Summary            string
+	ValidUsageExplicit []string
+	ValidUsageImplicit []string
+}
+
+func (doc VulkanRefpageMemberDoc) IsEmpty() bool {
+	return strings.TrimSpace(doc.Summary) == "" &&
+		len(doc.ValidUsageExplicit) == 0 &&
+		len(doc.ValidUsageImplicit) == 0
+}
+
+/*
 VulkanRefpageDoc is parsed Khronos registry man page prose for one API name.
 */
 type VulkanRefpageDoc struct {
@@ -18,7 +33,7 @@ type VulkanRefpageDoc struct {
 	Description        string
 	ValidUsageExplicit []string
 	ValidUsageImplicit []string
-	Members            map[string]string
+	Members            map[string]VulkanRefpageMemberDoc
 }
 
 /*
@@ -31,7 +46,7 @@ Lookup returns refpage documentation for name, falling back to aliasOf when the 
 */
 func (corpus VulkanRefpageCorpus) Lookup(name string, aliasOf string) VulkanRefpageDoc {
 	if corpus == nil {
-		return VulkanRefpageDoc{}
+		return VulkanRefpageDoc{Members: make(map[string]VulkanRefpageMemberDoc)}
 	}
 	if doc, ok := corpus[name]; ok && !doc.IsEmpty() {
 		return doc
@@ -41,15 +56,22 @@ func (corpus VulkanRefpageCorpus) Lookup(name string, aliasOf string) VulkanRefp
 			return doc
 		}
 	}
-	return VulkanRefpageDoc{}
+	return VulkanRefpageDoc{Members: make(map[string]VulkanRefpageMemberDoc)}
 }
 
 func (doc VulkanRefpageDoc) IsEmpty() bool {
-	return strings.TrimSpace(doc.Summary) == "" &&
-		strings.TrimSpace(doc.Description) == "" &&
-		len(doc.ValidUsageExplicit) == 0 &&
-		len(doc.ValidUsageImplicit) == 0 &&
-		len(doc.Members) == 0
+	if strings.TrimSpace(doc.Summary) != "" ||
+		strings.TrimSpace(doc.Description) != "" ||
+		len(doc.ValidUsageExplicit) != 0 ||
+		len(doc.ValidUsageImplicit) != 0 {
+		return false
+	}
+	for _, member := range doc.Members {
+		if !member.IsEmpty() {
+			return false
+		}
+	}
+	return true
 }
 
 /*
@@ -86,6 +108,9 @@ func vulkanRefpageCorpusNamesFromIR(ir VulkanSpecIR) []string {
 	}
 	for _, aggregate := range ir.Structs {
 		add(aggregate.Name)
+	}
+	for _, fn := range ir.Funcpointers {
+		add(fn.Name)
 	}
 	if ir.Constants.Name != "" {
 		for _, value := range ir.Constants.Values {
@@ -139,4 +164,15 @@ func vulkanRefpageCorpusLoad(refpageDir string) (VulkanRefpageCorpus, error) {
 	}
 
 	return corpus, nil
+}
+
+func vulkanRefpageMemberDocMerge(existing VulkanRefpageMemberDoc, add VulkanRefpageMemberDoc) VulkanRefpageMemberDoc {
+	if strings.TrimSpace(existing.Summary) == "" {
+		existing.Summary = add.Summary
+	} else if add.Summary != "" && !strings.Contains(existing.Summary, add.Summary) {
+		existing.Summary = vulkanSpecIRDocJoin(existing.Summary, add.Summary)
+	}
+	existing.ValidUsageExplicit = append(existing.ValidUsageExplicit, add.ValidUsageExplicit...)
+	existing.ValidUsageImplicit = append(existing.ValidUsageImplicit, add.ValidUsageImplicit...)
+	return existing
 }

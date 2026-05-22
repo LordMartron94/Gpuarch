@@ -14,6 +14,7 @@ const (
 	constantsBindingFile        = "bindings_constants_gen.go"
 	enumBindingFile             = "bindings_enums_gen.go"
 	flagsBindingFile            = "bindings_flags_gen.go"
+	funcpointerBindingFile      = "bindings_funcpointers_gen.go"
 	handlesBindingFile          = "bindings_handles_gen.go"
 	structsBindingFile          = "bindings_structs_gen.go"
 	vulkanBindingsGeneratorTool = "gpuarch Vulkan bindings generator"
@@ -31,6 +32,9 @@ func specToBindingsConvert(ir VulkanSpecIR, bindingsDir string, corpus VulkanRef
 		return err
 	}
 	if err := generateFlagsContent(ir.Flags, bindingsDir, corpus); err != nil {
+		return err
+	}
+	if err := generateFuncpointerContent(ir.Funcpointers, bindingsDir, corpus); err != nil {
 		return err
 	}
 	if err := generateHandlesContent(ir.Handles, bindingsDir, corpus); err != nil {
@@ -76,9 +80,6 @@ func vulkanSpecIRStructBindingElements(aggregate VulkanSpecIRStruct, corpus Vulk
 	}
 
 	doc := vulkanSpecIRDocCompose(aggregate.Name, aggregate.AliasOf, aggregate.XMLDoc, corpus, "")
-	if aggregate.IsUnion {
-		doc = vulkanSpecIRDocJoin("Vulkan union type.", doc)
-	}
 
 	if aggregate.AliasOf != "" {
 		elements := make([]codegen.FileElement, 0, 2)
@@ -143,6 +144,56 @@ func vulkanBindingsFormat(bindingsDir string) error {
 		return fmt.Errorf("gofmt %s: %w\n%s", bindingsDir, err, output)
 	}
 	return nil
+}
+
+func generateFuncpointerContent(funcpointers []VulkanSpecIRFuncpointer, bindingsDir string, corpus VulkanRefpageCorpus) error {
+	if len(funcpointers) == 0 {
+		return nil
+	}
+
+	needsUnsafe := false
+	for _, fn := range funcpointers {
+		if vulkanSpecIRFuncpointerNeedsUnsafe(fn) {
+			needsUnsafe = true
+			break
+		}
+	}
+
+	elements := bindingFilePreamble()
+	if needsUnsafe {
+		elements = append(elements, gocode.FileElementFrom(gocode.DeclImportBlock("unsafe")))
+		blankLine(&elements)
+	}
+
+	for _, fn := range funcpointers {
+		elements = append(elements, vulkanSpecIRFuncpointerBindingElements(fn, corpus)...)
+	}
+
+	return writeBindingFile(bindingsDir, funcpointerBindingFile, elements)
+}
+
+func vulkanSpecIRFuncpointerBindingElements(fn VulkanSpecIRFuncpointer, corpus VulkanRefpageCorpus) []codegen.FileElement {
+	if fn.Name == "" {
+		return nil
+	}
+
+	sig, err := vulkanSpecIRFuncpointerGoTypeExpr(fn)
+	if err != nil {
+		return nil
+	}
+
+	doc := vulkanSpecIRDocCompose(fn.Name, "", fn.XMLDoc, corpus, "")
+	elements := make([]codegen.FileElement, 0, 2)
+	elements = append(elements, gocode.FileElementFrom(
+		gocode.DeclTypeDefined(
+			fn.Name,
+			sig,
+			false,
+			vulkanSpecIRDocFormatExported(fn.Name, doc),
+		),
+	))
+	blankLine(&elements)
+	return elements
 }
 
 func generateHandlesContent(handles []VulkanSpecIRHandle, bindingsDir string, corpus VulkanRefpageCorpus) error {
