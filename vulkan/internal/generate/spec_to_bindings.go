@@ -9,24 +9,69 @@ import (
 )
 
 const (
+	basetypeBindingFile         = "bindings_basetypes_gen.go"
 	enumBindingFile             = "bindings_enums_gen.go"
+	flagsBindingFile            = "bindings_flags_gen.go"
 	vulkanBindingsGeneratorTool = "gpuarch Vulkan bindings generator"
 	vulkanEnumBaseTypeName      = "VkEnum"
 )
 
 func specToBindingsConvert(ir VulkanSpecIR, bindingsDir string) error {
+	if err := generateBasetypeContent(ir.Basetypes, bindingsDir); err != nil {
+		return err
+	}
 	if err := generateEnumContent(ir.Enums, bindingsDir); err != nil {
 		return err
+	}
+	if err := generateFlagsContent(ir.Flags, bindingsDir); err != nil {
+		return err
+	}
+	return nil
+}
+
+func writeBindingFile(bindingsDir string, fileName string, elements []codegen.FileElement) error {
+	file := gocode.DeclFile(elements...)
+
+	content, err := gocode.GoFileRenderWithOptions(file, gocode.RenderOptionsEnumBindings())
+	if err != nil {
+		return fmt.Errorf("render %s: %w", fileName, err)
+	}
+
+	outputPath := system.PathJoin(bindingsDir, fileName)
+	if err := system.FileWriteString(outputPath, content); err != nil {
+		return fmt.Errorf("write %s to %s: %w", fileName, outputPath, err)
 	}
 
 	return nil
 }
 
-func generateEnumContent(enums []VulkanSpecIREnum, bindingsDir string) error {
-	elements := make([]codegen.FileElement, 0, len(enums)*3+8)
+func bindingFilePreamble() []codegen.FileElement {
+	elements := make([]codegen.FileElement, 0, 4)
 	elements = append(elements, gocode.GoGeneratedFileHeader(vulkanBindingsGeneratorTool, time.Now())...)
 	elements = append(elements, gocode.FileElementFrom(gocode.DeclPackage("bindings")))
 	blankLine(&elements)
+	return elements
+}
+
+func generateBasetypeContent(basetypes []VulkanSpecIRBasetype, bindingsDir string) error {
+	elements := bindingFilePreamble()
+
+	for _, basetype := range basetypes {
+		elements = append(elements, gocode.FileElementFrom(
+			gocode.DeclTypeDefined(
+				basetype.Name,
+				gocode.TypeExprNamed(basetype.Underlying),
+				true,
+				gocode.GoDocFormatExported(basetype.Name, basetype.Doc),
+			),
+		))
+	}
+
+	return writeBindingFile(bindingsDir, basetypeBindingFile, elements)
+}
+
+func generateEnumContent(enums []VulkanSpecIREnum, bindingsDir string) error {
+	elements := bindingFilePreamble()
 	elements = append(elements, gocode.FileElementFrom(
 		gocode.DeclTypeDefined(
 			vulkanEnumBaseTypeName,
@@ -41,20 +86,17 @@ func generateEnumContent(enums []VulkanSpecIREnum, bindingsDir string) error {
 		elements = append(elements, vulkanSpecIREnumBindingElements(enum)...)
 	}
 
-	file := gocode.DeclFile(elements...)
+	return writeBindingFile(bindingsDir, enumBindingFile, elements)
+}
 
-	content, err := gocode.GoFileRenderWithOptions(file, gocode.RenderOptionsEnumBindings())
-	if err != nil {
-		return fmt.Errorf("render enum bindings: %w", err)
+func generateFlagsContent(flags []VulkanSpecIRFlags, bindingsDir string) error {
+	elements := bindingFilePreamble()
+
+	for _, flagType := range flags {
+		elements = append(elements, vulkanSpecIRFlagsBindingElements(flagType)...)
 	}
 
-	outputPath := system.PathJoin(bindingsDir, enumBindingFile)
-
-	if err := system.FileWriteString(outputPath, content); err != nil {
-		return fmt.Errorf("write enum bindings to %s: %w", outputPath, err)
-	}
-
-	return nil
+	return writeBindingFile(bindingsDir, flagsBindingFile, elements)
 }
 
 func vulkanSpecIREnumBindingElements(enum VulkanSpecIREnum) []codegen.FileElement {
@@ -87,6 +129,41 @@ func vulkanSpecIREnumBindingElements(enum VulkanSpecIREnum) []codegen.FileElemen
 	}
 
 	if len(specs) > 0 {
+		elements = append(elements, gocode.FileElementFrom(
+			gocode.DeclConstGroup(specs, "", true),
+		))
+	}
+
+	blankLine(&elements)
+	return elements
+}
+
+func vulkanSpecIRFlagsBindingElements(flagType VulkanSpecIRFlags) []codegen.FileElement {
+	if flagType.Name == "" || flagType.AggregateName == "" {
+		return nil
+	}
+
+	elements := make([]codegen.FileElement, 0, 3)
+	elements = append(elements, gocode.FileElementFrom(
+		gocode.DeclTypeDefined(
+			flagType.AggregateName,
+			gocode.TypeExprNamed(flagType.BaseTypeName),
+			false,
+			gocode.GoDocFormatExported(flagType.AggregateName, flagType.Doc),
+		),
+	))
+
+	if len(flagType.Values) > 0 {
+		specs := make([]gocode.ConstSpec, 0, len(flagType.Values))
+		flagsType := gocode.TypeExprNamedPtr(flagType.AggregateName)
+		for _, value := range flagType.Values {
+			specs = append(specs, gocode.ConstSpecNew(
+				value.Key,
+				flagsType,
+				value.Value,
+				gocode.GoDocFormatExported(value.Key, value.Doc),
+			))
+		}
 		elements = append(elements, gocode.FileElementFrom(
 			gocode.DeclConstGroup(specs, "", true),
 		))

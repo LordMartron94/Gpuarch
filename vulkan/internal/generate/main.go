@@ -76,4 +76,6 @@ func runBindingGeneration(specOutputDir string, bindingOutputDir string) {
 	if err := specToBindingsConvert(ir, bindingOutputDir); err != nil {
 		panic(err)
 	}
+
+	fmt.Printf("Wrote Vulkan bindings to %s\n", bindingOutputDir)
 }

@@ -1,24 +1,5 @@
 package main
 
-import "sort"
-
-/*
-vulkanSpecIRBuild constructs the registry IR from a parsed XML document tree.
-
-[Parameters]
-root is the document root from xmlSpecTreeParse.
-
-[Returns]
-A populated VulkanSpecIR. Enum entries are sorted by name. Does not mutate root.
-*/
-func vulkanSpecIRBuild(root *xmlSpecNode) VulkanSpecIR {
-	enums := vulkanSpecIREnumsCollect(root)
-	sort.Slice(enums, func(i, j int) bool {
-		return enums[i].Name < enums[j].Name
-	})
-	return VulkanSpecIR{Enums: enums}
-}
-
 func vulkanSpecIREnumsCollect(root *xmlSpecNode) []VulkanSpecIREnum {
 	if root == nil {
 		return nil
