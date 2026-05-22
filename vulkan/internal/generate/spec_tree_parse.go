@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
-	"foundation/system"
 	"io"
-	"path/filepath"
 	"strings"
 )
 
@@ -108,35 +106,4 @@ func xmlSpecAttrsFromXML(attrs []xml.Attr) []xmlSpecAttr {
 		}
 	}
 	return out
-}
-
-/*
-vulkanRegistrySpecTreeLoadFromFile reads registry XML from specXMLPath and parses it into a tree.
-
-[Parameters]
-specXMLPath must point to an existing vk.xml file.
-
-[Returns]
-The raw document bytes, the parsed root node, and nil error on success. The caller owns the returned slice.
-
-[Side Effects]
-Reads specXMLPath from disk.
-*/
-func vulkanRegistrySpecTreeLoadFromFile(specXMLPath string) ([]byte, *xmlSpecNode, error) {
-	absXMLPath, err := filepath.Abs(specXMLPath)
-	if err != nil {
-		return nil, nil, fmt.Errorf("resolve spec XML path: %w", err)
-	}
-
-	content, err := system.FileReadAllBytes(absXMLPath)
-	if err != nil {
-		return nil, nil, fmt.Errorf("read Vulkan registry spec at %s: %w", absXMLPath, err)
-	}
-
-	root, err := xmlSpecTreeParse(content)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return content, root, nil
 }

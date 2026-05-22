@@ -90,27 +90,6 @@ func vulkanRegistrySpecDebugTreeWrite(sourcePath string, outputPath string, root
 	return nil
 }
 
-/*
-vulkanRegistrySpecWriteDebugTree reads registry XML from specXMLPath, parses it, and writes a debug tree dump to outputPath.
-
-[Parameters]
-specXMLPath must point to an existing vk.xml file. outputPath is the destination .txt file.
-
-[Returns]
-nil on success. An error when read, parse, or write fails.
-
-[Side Effects]
-Reads specXMLPath and overwrites outputPath when it already exists.
-*/
-func vulkanRegistrySpecWriteDebugTree(specXMLPath string, outputPath string) error {
-	_, root, err := vulkanRegistrySpecTreeLoadFromFile(specXMLPath)
-	if err != nil {
-		return err
-	}
-
-	return vulkanRegistrySpecDebugTreeWrite(specXMLPath, outputPath, root, xmlSpecTreeDebugDefaultOptions())
-}
-
 func xmlSpecTreeSummaryWrite(builder *strings.Builder, root *xmlSpecNode) {
 	if root == nil {
 		builder.WriteString("(empty document)\n")
