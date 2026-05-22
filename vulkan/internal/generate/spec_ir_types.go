@@ -7,8 +7,31 @@ Additional registry constructs will be added here as binding generation grows.
 */
 type VulkanSpecIR struct {
 	Basetypes []VulkanSpecIRBasetype
+	Constants VulkanSpecIRConstants
 	Enums     []VulkanSpecIREnum
 	Flags     []VulkanSpecIRFlags
+}
+
+/*
+VulkanSpecIRConstants is the API Constants block from <enums type="constants">.
+*/
+type VulkanSpecIRConstants struct {
+	Name   string
+	Doc    string
+	Values []VulkanSpecIRConstantValue
+}
+
+/*
+VulkanSpecIRConstantValue is one hardcoded constant from the registry API Constants block.
+
+Key is the Vulkan token name. Value is a Go constant literal expression. GoType is set when the
+constant must be typed in Go output (for example float32); empty means an untyped const.
+*/
+type VulkanSpecIRConstantValue struct {
+	Key    string
+	Value  string
+	GoType string
+	Doc    string
 }
 
 /*

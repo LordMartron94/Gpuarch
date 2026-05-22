@@ -10,6 +10,7 @@ import (
 
 const (
 	basetypeBindingFile         = "bindings_basetypes_gen.go"
+	constantsBindingFile        = "bindings_constants_gen.go"
 	enumBindingFile             = "bindings_enums_gen.go"
 	flagsBindingFile            = "bindings_flags_gen.go"
 	vulkanBindingsGeneratorTool = "gpuarch Vulkan bindings generator"
@@ -18,6 +19,9 @@ const (
 
 func specToBindingsConvert(ir VulkanSpecIR, bindingsDir string) error {
 	if err := generateBasetypeContent(ir.Basetypes, bindingsDir); err != nil {
+		return err
+	}
+	if err := generateConstantsContent(ir.Constants, bindingsDir); err != nil {
 		return err
 	}
 	if err := generateEnumContent(ir.Enums, bindingsDir); err != nil {
@@ -68,6 +72,48 @@ func generateBasetypeContent(basetypes []VulkanSpecIRBasetype, bindingsDir strin
 	}
 
 	return writeBindingFile(bindingsDir, basetypeBindingFile, elements)
+}
+
+func generateConstantsContent(constants VulkanSpecIRConstants, bindingsDir string) error {
+	if len(constants.Values) == 0 {
+		return nil
+	}
+
+	elements := bindingFilePreamble()
+	elements = append(elements, vulkanSpecIRConstantsBindingElements(constants)...)
+	return writeBindingFile(bindingsDir, constantsBindingFile, elements)
+}
+
+func vulkanSpecIRConstantsBindingElements(constants VulkanSpecIRConstants) []codegen.FileElement {
+	specs := make([]gocode.ConstSpec, 0, len(constants.Values))
+	for _, value := range constants.Values {
+		if value.Key == "" || value.Value == "" {
+			continue
+		}
+
+		var typ *gocode.TypeExpr
+		if value.GoType != "" {
+			typ = gocode.TypeExprNamedPtr(value.GoType)
+		}
+
+		specs = append(specs, gocode.ConstSpecNew(
+			value.Key,
+			typ,
+			value.Value,
+			gocode.GoDocFormatExported(value.Key, value.Doc),
+		))
+	}
+
+	if len(specs) == 0 {
+		return nil
+	}
+
+	elements := make([]codegen.FileElement, 0, 2)
+	elements = append(elements, gocode.FileElementFrom(
+		gocode.DeclConstGroup(specs, constants.Doc, true),
+	))
+	blankLine(&elements)
+	return elements
 }
 
 func generateEnumContent(enums []VulkanSpecIREnum, bindingsDir string) error {

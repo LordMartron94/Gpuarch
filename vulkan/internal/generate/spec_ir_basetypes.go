@@ -2,6 +2,14 @@ package main
 
 import "strings"
 
+/*
+vulkanSpecIRCTypeGo maps a Vulkan registry C type name (for example uint32_t) to a Go type name.
+*/
+func vulkanSpecIRCTypeGo(cType string) (goType string, ok bool) {
+	goType, ok = vulkanSpecIRCTypeToGo[cType]
+	return goType, ok
+}
+
 var vulkanSpecIRCTypeToGo = map[string]string{
 	"uint8_t":  "uint8",
 	"uint16_t": "uint16",

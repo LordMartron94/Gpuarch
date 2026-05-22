@@ -13,6 +13,7 @@ A populated VulkanSpecIR with sorted entries. Does not mutate root.
 */
 func vulkanSpecIRBuild(root *xmlSpecNode) VulkanSpecIR {
 	basetypes := vulkanSpecIRBasetypesCollect(root)
+	constants := vulkanSpecIRConstantsCollect(root)
 	enums := vulkanSpecIREnumsCollect(root)
 	flags := vulkanSpecIRFlagsCollect(root)
 
@@ -22,6 +23,7 @@ func vulkanSpecIRBuild(root *xmlSpecNode) VulkanSpecIR {
 
 	return VulkanSpecIR{
 		Basetypes: basetypes,
+		Constants: constants,
 		Enums:     enums,
 		Flags:     flags,
 	}
