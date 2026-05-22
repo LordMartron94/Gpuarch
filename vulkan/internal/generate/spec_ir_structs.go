@@ -119,9 +119,18 @@ func vulkanSpecIRMemberGoTypeString(memberNode *xmlSpecNode, registry VulkanSpec
 		return "", false
 	}
 
+	pointerDepth := vulkanSpecIRMemberPointerDepth(memberNode)
 	goType := goBase
-	for i := 0; i < vulkanSpecIRMemberPointerDepth(memberNode); i++ {
-		goType = "*" + goType
+	if goBase == "unsafe.Pointer" && pointerDepth >= 1 {
+		// void* and similar single indirection map to unsafe.Pointer, not *unsafe.Pointer.
+		goType = "unsafe.Pointer"
+		for i := 1; i < pointerDepth; i++ {
+			goType = "*" + goType
+		}
+	} else {
+		for i := 0; i < pointerDepth; i++ {
+			goType = "*" + goType
+		}
 	}
 
 	if arrayLen := vulkanSpecIRMemberArrayLength(memberNode); arrayLen != "" {
