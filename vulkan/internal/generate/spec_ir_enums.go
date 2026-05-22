@@ -28,6 +28,7 @@ func vulkanSpecIREnumBuild(enumsNode *xmlSpecNode) VulkanSpecIREnum {
 		Doc:  xmlSpecNodeCommentAttr(enumsNode),
 	}
 
+	var rawValues []vulkanSpecIRRawValue
 	var sectionDoc string
 	for _, child := range enumsNode.Children {
 		switch child.Name {
@@ -35,21 +36,23 @@ func vulkanSpecIREnumBuild(enumsNode *xmlSpecNode) VulkanSpecIREnum {
 			sectionDoc = xmlSpecNodeCommentText(child)
 
 		case "enum":
-			value := vulkanSpecIREnumValueBuild(child, sectionDoc)
-			if value.Key == "" || value.Value == "" {
+			raw := vulkanSpecIREnumRawValueBuild(child, sectionDoc)
+			if raw.Key == "" {
 				continue
 			}
-			enumType.Values = append(enumType.Values, value)
+			rawValues = append(rawValues, raw)
 		}
 	}
 
+	enumType.Values = vulkanSpecIRRawValuesResolveEnumValues(rawValues)
 	return enumType
 }
 
-func vulkanSpecIREnumValueBuild(enumNode *xmlSpecNode, sectionDoc string) VulkanSpecIREnumValue {
-	return VulkanSpecIREnumValue{
-		Key:   xmlSpecNodeAttrValue(enumNode, "name"),
-		Value: xmlSpecNodeAttrValue(enumNode, "value"),
-		Doc:   vulkanSpecIRDocJoin(sectionDoc, xmlSpecNodeCommentAttr(enumNode)),
+func vulkanSpecIREnumRawValueBuild(enumNode *xmlSpecNode, sectionDoc string) vulkanSpecIRRawValue {
+	return vulkanSpecIRRawValue{
+		Key:         xmlSpecNodeAttrValue(enumNode, "name"),
+		Value:       xmlSpecNodeAttrValue(enumNode, "value"),
+		AliasTarget: xmlSpecNodeAttrValue(enumNode, "alias"),
+		Doc:         vulkanSpecIRDocJoin(sectionDoc, xmlSpecNodeCommentAttr(enumNode)),
 	}
 }

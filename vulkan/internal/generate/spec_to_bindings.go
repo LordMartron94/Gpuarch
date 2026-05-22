@@ -185,7 +185,7 @@ func vulkanSpecIREnumBindingElements(enum VulkanSpecIREnum) []codegen.FileElemen
 }
 
 func vulkanSpecIRFlagsBindingElements(flagType VulkanSpecIRFlags) []codegen.FileElement {
-	if flagType.Name == "" || flagType.AggregateName == "" {
+	if flagType.AggregateName == "" {
 		return nil
 	}
 
