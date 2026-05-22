@@ -15,6 +15,7 @@ const (
 	enumBindingFile             = "bindings_enums_gen.go"
 	flagsBindingFile            = "bindings_flags_gen.go"
 	handlesBindingFile          = "bindings_handles_gen.go"
+	structsBindingFile          = "bindings_structs_gen.go"
 	vulkanBindingsGeneratorTool = "gpuarch Vulkan bindings generator"
 	vulkanEnumBaseTypeName      = "VkEnum"
 )
@@ -35,7 +36,86 @@ func specToBindingsConvert(ir VulkanSpecIR, bindingsDir string) error {
 	if err := generateHandlesContent(ir.Handles, bindingsDir); err != nil {
 		return err
 	}
+	if err := generateStructsContent(ir.Structs, bindingsDir); err != nil {
+		return err
+	}
 	return vulkanBindingsFormat(bindingsDir)
+}
+
+func generateStructsContent(structs []VulkanSpecIRStruct, bindingsDir string) error {
+	if len(structs) == 0 {
+		return nil
+	}
+
+	needsUnsafe := false
+	for _, aggregate := range structs {
+		for _, field := range aggregate.Fields {
+			if field.NeedsUnsafe {
+				needsUnsafe = true
+				break
+			}
+		}
+	}
+
+	elements := bindingFilePreamble()
+	if needsUnsafe {
+		elements = append(elements, gocode.FileElementFrom(gocode.DeclImportBlock("unsafe")))
+		blankLine(&elements)
+	}
+
+	for _, aggregate := range structs {
+		elements = append(elements, vulkanSpecIRStructBindingElements(aggregate)...)
+	}
+
+	return writeBindingFile(bindingsDir, structsBindingFile, elements)
+}
+
+func vulkanSpecIRStructBindingElements(aggregate VulkanSpecIRStruct) []codegen.FileElement {
+	if aggregate.Name == "" {
+		return nil
+	}
+
+	doc := aggregate.Doc
+	if aggregate.IsUnion {
+		doc = vulkanSpecIRDocJoin("Vulkan union type.", doc)
+	}
+
+	if aggregate.AliasOf != "" {
+		elements := make([]codegen.FileElement, 0, 2)
+		elements = append(elements, gocode.FileElementFrom(
+			gocode.DeclTypeDefined(
+				aggregate.Name,
+				gocode.TypeExprNamed(aggregate.AliasOf),
+				true,
+				gocode.GoDocFormatExported(aggregate.Name, doc),
+			),
+		))
+		blankLine(&elements)
+		return elements
+	}
+
+	fields := make([]gocode.StructFieldDecl, 0, len(aggregate.Fields))
+	for _, field := range aggregate.Fields {
+		if field.Name == "" || field.GoType == "" {
+			continue
+		}
+		typ, err := gocode.TypeExprFromGoTypeString(field.GoType)
+		if err != nil {
+			continue
+		}
+		fields = append(fields, gocode.StructFieldTypeDoc(
+			field.Name,
+			typ,
+			gocode.GoDocFormatExported(field.Name, field.Doc),
+		))
+	}
+
+	elements := make([]codegen.FileElement, 0, 2)
+	elements = append(elements, gocode.FileElementFrom(
+		gocode.DeclTypeStruct(aggregate.Name, fields, gocode.GoDocFormatExported(aggregate.Name, doc)),
+	))
+	blankLine(&elements)
+	return elements
 }
 
 /*

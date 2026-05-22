@@ -11,6 +11,7 @@ type VulkanSpecIR struct {
 	Enums     []VulkanSpecIREnum
 	Flags     []VulkanSpecIRFlags
 	Handles   []VulkanSpecIRHandle
+	Structs   []VulkanSpecIRStruct
 }
 
 /*
@@ -33,6 +34,29 @@ type VulkanSpecIRConstantValue struct {
 	Value  string
 	GoType string
 	Doc    string
+}
+
+/*
+VulkanSpecIRStruct is one Vulkan struct or union type from <type category="struct"> or <type category="union">.
+
+Unions are emitted as Go structs with overlapping fields, matching common Vulkan Go binding practice.
+*/
+type VulkanSpecIRStruct struct {
+	Name    string
+	IsUnion bool
+	AliasOf string
+	Doc     string
+	Fields  []VulkanSpecIRStructField
+}
+
+/*
+VulkanSpecIRStructField is one struct or union member.
+*/
+type VulkanSpecIRStructField struct {
+	Name        string
+	GoType      string
+	Doc         string
+	NeedsUnsafe bool
 }
 
 /*

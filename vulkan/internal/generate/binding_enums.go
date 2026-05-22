@@ -12,8 +12,8 @@ ir is the registry intermediate representation.
 Writes to stdout.
 */
 func vulkanBindingSpecIRPrint(ir VulkanSpecIR) {
-	fmt.Printf("Vulkan spec IR: %d basetypes, %d API constants, %d enum types, %d flag types, %d handles\n",
-		len(ir.Basetypes), len(ir.Constants.Values), len(ir.Enums), len(ir.Flags), len(ir.Handles))
+	fmt.Printf("Vulkan spec IR: %d basetypes, %d API constants, %d enum types, %d flag types, %d handles, %d structs/unions\n",
+		len(ir.Basetypes), len(ir.Constants.Values), len(ir.Enums), len(ir.Flags), len(ir.Handles), len(ir.Structs))
 	for _, basetype := range ir.Basetypes {
 		fmt.Printf("  basetype %s -> %s\n", basetype.Name, basetype.Underlying)
 	}
