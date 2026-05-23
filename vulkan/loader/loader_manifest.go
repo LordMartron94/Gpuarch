@@ -103,6 +103,7 @@ func vulkanCommandManifestEntryBind(
 	if err := syscore.SYSCORE_Pure_FunctionBindAddress(entry.target, addr); err != nil {
 		return fmt.Errorf("vulkan loader: bind %q: %w", catalog.vkName, err)
 	}
+
 	return nil
 }
 
