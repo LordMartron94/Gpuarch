@@ -162,10 +162,7 @@ func vulkanSpecIRParamGoTypeString(paramNode *xmlSpecNode, registry VulkanSpecIR
 		return "", false, false
 	}
 
-	goType = goBase
-	for i := 0; i < pointerDepth; i++ {
-		goType = "*" + goType
-	}
+	goType = vulkanSpecIRPointerGoType(goBase, pointerDepth)
 
 	return goType, strings.Contains(goType, "unsafe.Pointer"), true
 }
