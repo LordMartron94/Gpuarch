@@ -11,50 +11,6 @@ const vulkanRegistryManPageBaseURL = "https://registry.khronos.org/vulkan/specs/
 var vulkanSpecIRDocHTMLTagPattern = regexp.MustCompile(`<[^>]+>`)
 var vulkanSpecIRDocWhitespacePattern = regexp.MustCompile(`[ \t]+\n`)
 
-/*
-xmlSpecNodeCommentAttr returns the comment attribute on node when present.
-*/
-func xmlSpecNodeCommentAttr(node *xmlSpecNode) string {
-	return strings.TrimSpace(xmlSpecNodeAttrValue(node, "comment"))
-}
-
-/*
-xmlSpecNodeCommentText returns trimmed character data on a <comment> element.
-*/
-func xmlSpecNodeCommentText(node *xmlSpecNode) string {
-	if node == nil {
-		return ""
-	}
-	return strings.TrimSpace(node.Text)
-}
-
-/*
-xmlSpecNodeDirectCommentsCollect returns documentation from the comment attribute and direct <comment> children.
-*/
-func xmlSpecNodeDirectCommentsCollect(node *xmlSpecNode) string {
-	if node == nil {
-		return ""
-	}
-
-	var parts []string
-	if comment := xmlSpecNodeCommentAttr(node); comment != "" {
-		parts = append(parts, comment)
-	}
-
-	for _, child := range node.Children {
-		if child.Name == "comment" {
-			if text := xmlSpecNodeCommentText(child); text != "" {
-				parts = append(parts, text)
-			}
-		}
-	}
-
-	return vulkanSpecIRDocJoin(parts...)
-}
-
-/*
-vulkanSpecIRDocJoin merges documentation fragments, omitting empty parts.
-*/
 func vulkanSpecIRDocJoin(parts ...string) string {
 	nonEmpty := make([]string, 0, len(parts))
 	for _, part := range parts {
