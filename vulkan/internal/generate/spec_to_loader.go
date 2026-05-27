@@ -16,11 +16,20 @@ const (
 	vulkanLoaderGeneratorTool  = "gpuarch Vulkan loader generator"
 	vulkanLoaderBindingsImport = "gpuarch/vulkan/bindings"
 
-	vulkanLoaderGlobalCommandsType   = "VulkanGlobalCommands"
-	vulkanLoaderInstanceCommandsType = "VulkanInstanceCommands"
-	vulkanLoaderDeviceCommandsType   = "VulkanDeviceCommands"
-	vulkanLoaderCommandMappingType   = "vulkanCommandMapping"
+	vulkanLoaderCommandsType       = "VulkanCommands"
+	vulkanLoaderCommandMappingType = "vulkanCommandMapping"
 )
+
+var vulkanLoaderEndpointOrder = []VulkanSpecIRCommandEndpoint{
+	VulkanCommandEndpointGlobal,
+	VulkanCommandEndpointInstance,
+	VulkanCommandEndpointPhysicalDevice,
+	VulkanCommandEndpointSurface,
+	VulkanCommandEndpointSwapchain,
+	VulkanCommandEndpointDevice,
+	VulkanCommandEndpointQueue,
+	VulkanCommandEndpointCommandBuffer,
+}
 
 func specToLoaderConvert(ir VulkanSpecIR, loaderDir string, corpus VulkanRefpageCorpus) error {
 	if err := generateLoaderCommandsContent(ir.Commands, loaderDir, corpus); err != nil {
@@ -37,16 +46,16 @@ func generateLoaderCommandsContent(commands []VulkanSpecIRCommand, loaderDir str
 		return nil
 	}
 
-	byTier := map[VulkanSpecIRCommandLoaderTier][]VulkanSpecIRCommand{
-		VulkanCommandLoaderTierGlobal:   {},
-		VulkanCommandLoaderTierInstance: {},
-		VulkanCommandLoaderTierDevice:   {},
-	}
+	byEndpoint := map[VulkanSpecIRCommandEndpoint][]VulkanSpecIRCommand{}
 	for _, command := range commands {
 		if command.GoFieldName == "" || command.PFNTypeName == "" {
 			continue
 		}
-		byTier[command.LoaderTier] = append(byTier[command.LoaderTier], command)
+		endpoint := command.CommandEndpoint
+		if endpoint == "" {
+			endpoint = VulkanCommandEndpointInstance
+		}
+		byEndpoint[endpoint] = append(byEndpoint[endpoint], command)
 	}
 
 	elements := loaderFilePreamble()
@@ -54,19 +63,36 @@ func generateLoaderCommandsContent(commands []VulkanSpecIRCommand, loaderDir str
 	elements = append(elements, gocode.FileElementFrom(vulkanLoaderCommandMappingTypeDecl()))
 	blankLine(&elements)
 
+	for _, endpoint := range vulkanLoaderEndpointOrder {
+		endpointCommands := byEndpoint[endpoint]
+		if len(endpointCommands) == 0 {
+			continue
+		}
+		sort.Slice(endpointCommands, func(i, j int) bool {
+			return endpointCommands[i].GoFieldName < endpointCommands[j].GoFieldName
+		})
+		typeName := vulkanLoaderEndpointTypeName(endpoint)
+		section := vulkanLoaderEndpointSectionLabel(endpoint)
+		elements = append(elements, gocode.FileElementFrom(
+			vulkanLoaderCommandsStructDecl(typeName, section, endpointCommands, corpus),
+		))
+		blankLine(&elements)
+	}
+
+	elements = append(elements, gocode.FileElementFrom(vulkanLoaderCommandsRootStructDecl(byEndpoint)))
+	blankLine(&elements)
+
 	tierSpecs := []struct {
 		tier     VulkanSpecIRCommandLoaderTier
-		typeName string
-		section  string
 		loadName string
 	}{
-		{VulkanCommandLoaderTierGlobal, vulkanLoaderGlobalCommandsType, "Global commands", "VulkanGlobalCommandsLoad"},
-		{VulkanCommandLoaderTierInstance, vulkanLoaderInstanceCommandsType, "Instance commands", "VulkanInstanceCommandsLoad"},
-		{VulkanCommandLoaderTierDevice, vulkanLoaderDeviceCommandsType, "Device commands", "VulkanDeviceCommandsLoad"},
+		{VulkanCommandLoaderTierGlobal, "VulkanCommandsLoadGlobal"},
+		{VulkanCommandLoaderTierInstance, "VulkanCommandsLoadInstance"},
+		{VulkanCommandLoaderTierDevice, "VulkanCommandsLoadDevice"},
 	}
 
 	for _, spec := range tierSpecs {
-		tierCommands := byTier[spec.tier]
+		tierCommands := vulkanLoaderCommandsForTier(commands, spec.tier)
 		if len(tierCommands) == 0 {
 			continue
 		}
@@ -74,16 +100,101 @@ func generateLoaderCommandsContent(commands []VulkanSpecIRCommand, loaderDir str
 			return tierCommands[i].GoFieldName < tierCommands[j].GoFieldName
 		})
 		elements = append(elements, gocode.FileElementFrom(
-			vulkanLoaderCommandsStructDecl(spec.typeName, spec.section, tierCommands, corpus),
-		))
-		blankLine(&elements)
-		elements = append(elements, gocode.FileElementFrom(
-			vulkanLoaderCommandsLoadFuncDecl(spec.loadName, spec.typeName, spec.tier, tierCommands),
+			vulkanLoaderCommandsTierLoadFuncDecl(spec.loadName, spec.tier, tierCommands),
 		))
 		blankLine(&elements)
 	}
 
 	return writeLoaderFile(loaderDir, loaderCommandsFile, elements)
+}
+
+func vulkanLoaderCommandsForTier(commands []VulkanSpecIRCommand, tier VulkanSpecIRCommandLoaderTier) []VulkanSpecIRCommand {
+	filtered := make([]VulkanSpecIRCommand, 0, len(commands))
+	for _, command := range commands {
+		if command.GoFieldName == "" || command.PFNTypeName == "" {
+			continue
+		}
+		if command.LoaderTier == tier {
+			filtered = append(filtered, command)
+		}
+	}
+	return filtered
+}
+
+func vulkanLoaderEndpointTypeName(endpoint VulkanSpecIRCommandEndpoint) string {
+	return vulkanLoaderCommandsType + vulkanLoaderEndpointGoName(endpoint) + "Endpoint"
+}
+
+func vulkanLoaderEndpointGoName(endpoint VulkanSpecIRCommandEndpoint) string {
+	switch endpoint {
+	case VulkanCommandEndpointGlobal:
+		return "Global"
+	case VulkanCommandEndpointInstance:
+		return "Instance"
+	case VulkanCommandEndpointPhysicalDevice:
+		return "PhysicalDevice"
+	case VulkanCommandEndpointSurface:
+		return "Surface"
+	case VulkanCommandEndpointSwapchain:
+		return "Swapchain"
+	case VulkanCommandEndpointDevice:
+		return "Device"
+	case VulkanCommandEndpointQueue:
+		return "Queue"
+	case VulkanCommandEndpointCommandBuffer:
+		return "CommandBuffer"
+	default:
+		return "Instance"
+	}
+}
+
+func vulkanLoaderEndpointSectionLabel(endpoint VulkanSpecIRCommandEndpoint) string {
+	switch endpoint {
+	case VulkanCommandEndpointGlobal:
+		return "Global commands"
+	case VulkanCommandEndpointInstance:
+		return "Instance commands"
+	case VulkanCommandEndpointPhysicalDevice:
+		return "Physical device commands"
+	case VulkanCommandEndpointSurface:
+		return "Surface commands"
+	case VulkanCommandEndpointSwapchain:
+		return "Swapchain commands"
+	case VulkanCommandEndpointDevice:
+		return "Device commands"
+	case VulkanCommandEndpointQueue:
+		return "Queue commands"
+	case VulkanCommandEndpointCommandBuffer:
+		return "Command buffer commands"
+	default:
+		return "Commands"
+	}
+}
+
+func vulkanLoaderCommandsRootStructDecl(byEndpoint map[VulkanSpecIRCommandEndpoint][]VulkanSpecIRCommand) gocode.TypeStructDecl {
+	fields := make([]gocode.StructFieldDecl, 0, len(vulkanLoaderEndpointOrder))
+	for endpointIndex, endpoint := range vulkanLoaderEndpointOrder {
+		if len(byEndpoint[endpoint]) == 0 {
+			continue
+		}
+		goName := vulkanLoaderEndpointGoName(endpoint)
+		typeName := vulkanLoaderEndpointTypeName(endpoint)
+		leading := []codegen.Node(nil)
+		if endpointIndex == 0 {
+			leading = []codegen.Node{gocode.LayoutBlankLineNode()}
+		}
+		fields = append(fields, gocode.StructFieldTypeDoc(
+			goName,
+			gocode.TypeExprNamed(typeName),
+			goName+" groups Vulkan commands whose primary handle is "+vulkanLoaderEndpointSectionLabel(endpoint)+".",
+			leading...,
+		))
+	}
+	return gocode.DeclTypeStruct(
+		vulkanLoaderCommandsType,
+		fields,
+		"VulkanCommands holds loaded Vulkan entry points from the ICD, grouped by semantic endpoint.",
+	)
 }
 
 func loaderFilePreamble() []codegen.FileElement {
@@ -105,6 +216,14 @@ func vulkanLoaderCommandMappingTypeDecl() gocode.TypeStructDecl {
 		gocode.StructFieldTypeDoc("cName", gocode.TypeExprPointer(gocode.TypeExprNamed("byte")), "cName is the NUL-terminated Vulkan entry point name."),
 		gocode.StructFieldTypeDoc("debugName", gocode.TypeExprNamed("string"), "debugName is the entry point name for error messages."),
 	}, "vulkanCommandMapping describes one proc addr bind target.")
+}
+
+func vulkanLoaderCommandsFieldSelector(holderIdent codegen.Expr, command VulkanSpecIRCommand) codegen.Expr {
+	endpointName := vulkanLoaderEndpointGoName(command.CommandEndpoint)
+	return gocode.ExprSelector(
+		gocode.ExprSelector(holderIdent, endpointName),
+		command.GoFieldName,
+	)
 }
 
 func vulkanLoaderCommandsStructDecl(
@@ -143,9 +262,8 @@ func vulkanLoaderCommandsStructDecl(
 	return gocode.DeclTypeStruct(typeName, fields, typeName+" holds loaded Vulkan commands resolved from the ICD.")
 }
 
-func vulkanLoaderCommandsLoadFuncDecl(
+func vulkanLoaderCommandsTierLoadFuncDecl(
 	loadName string,
-	holderType string,
 	tier VulkanSpecIRCommandLoaderTier,
 	commands []VulkanSpecIRCommand,
 ) gocode.FuncDecl {
@@ -156,36 +274,33 @@ func vulkanLoaderCommandsLoadFuncDecl(
 	case VulkanCommandLoaderTierInstance:
 		params = append(params,
 			gocode.ParamType{Name: "instance", Type: gocode.TypeExprNamed("bindings.VkInstance")},
-			gocode.ParamType{Name: "dest", Type: gocode.TypeExprPointer(gocode.TypeExprNamed(holderType))},
+			gocode.ParamType{Name: "commands", Type: gocode.TypeExprPointer(gocode.TypeExprNamed(vulkanLoaderCommandsType))},
 		)
 	case VulkanCommandLoaderTierDevice:
 		params = append(params,
 			gocode.ParamType{Name: "device", Type: gocode.TypeExprNamed("bindings.VkDevice")},
-			gocode.ParamType{Name: "dest", Type: gocode.TypeExprPointer(gocode.TypeExprNamed(holderType))},
+			gocode.ParamType{Name: "commands", Type: gocode.TypeExprPointer(gocode.TypeExprNamed(vulkanLoaderCommandsType))},
 		)
 	default:
-		params = append(params, gocode.ParamType{Name: "dest", Type: gocode.TypeExprPointer(gocode.TypeExprNamed(holderType))})
+		params = append(params, gocode.ParamType{Name: "commands", Type: gocode.TypeExprPointer(gocode.TypeExprNamed(vulkanLoaderCommandsType))})
 	}
 	returns := []gocode.TypeExpr{gocode.TypeExprNamed("error")}
 
-	body := vulkanLoaderCommandsLoadBody(holderType, tier, commands)
+	body := vulkanLoaderCommandsLoadBody(tier, commands)
 	return gocode.DeclFunc(loadName, params, returns, body)
 }
 
 func vulkanLoaderCommandsLoadBody(
-	holderType string,
 	tier VulkanSpecIRCommandLoaderTier,
 	commands []VulkanSpecIRCommand,
 ) gocode.BlockStmt {
-	holderIdent := gocode.ExprIdent("dest")
+	holderIdent := gocode.ExprIdent("commands")
 	mappingElements := make([]codegen.Expr, 0, len(commands))
 	for _, command := range commands {
 		mappingElements = append(mappingElements, gocode.ExprCompositeLit(vulkanLoaderCommandMappingType, []gocode.FieldInit{
 			{
-				Name: "target",
-				Value: gocode.ExprAddressOf(
-					gocode.ExprSelector(holderIdent, command.GoFieldName),
-				),
+				Name:  "target",
+				Value: gocode.ExprAddressOf(vulkanLoaderCommandsFieldSelector(holderIdent, command)),
 			},
 			{Name: "cName", Value: gocode.ExprCall(
 				gocode.ExprSelector(gocode.ExprIdent("syscore"), "SYSCORE_C_StringToCStringFirstByte"),
@@ -205,6 +320,45 @@ func vulkanLoaderCommandsLoadBody(
 	stmts = append(stmts, vulkanLoaderBindLoopStmts(tier)...)
 	stmts = append(stmts, gocode.StmtReturn(gocode.ExprNil()))
 	return gocode.StmtBlock(stmts...)
+}
+
+func vulkanLoaderMissingEntryPointReturnStmt(tier VulkanSpecIRCommandLoaderTier, commandIdent codegen.Expr) []codegen.Stmt {
+	var instanceArg codegen.Expr
+	var deviceArg codegen.Expr
+	switch tier {
+	case VulkanCommandLoaderTierInstance:
+		instanceArg = gocode.ExprIdent("instance")
+		deviceArg = gocode.ExprIntLit(0)
+	case VulkanCommandLoaderTierDevice:
+		instanceArg = gocode.ExprIntLit(0)
+		deviceArg = gocode.ExprIdent("device")
+	default:
+		instanceArg = gocode.ExprIntLit(0)
+		deviceArg = gocode.ExprIntLit(0)
+	}
+
+	return []codegen.Stmt{
+		gocode.StmtReturn(
+			gocode.ExprCall(
+				gocode.ExprIdent("vulkanLoaderEntryPointResolveError"),
+				gocode.ExprSelector(commandIdent, "debugName"),
+				vulkanLoaderBindTierIntLit(tier),
+				instanceArg,
+				deviceArg,
+			),
+		),
+	}
+}
+
+func vulkanLoaderBindTierIntLit(tier VulkanSpecIRCommandLoaderTier) *gocode.IntLitExpr {
+	switch tier {
+	case VulkanCommandLoaderTierGlobal:
+		return gocode.ExprIntLit(vulkanCommandLoaderTierGlobal)
+	case VulkanCommandLoaderTierDevice:
+		return gocode.ExprIntLit(vulkanCommandLoaderTierDevice)
+	default:
+		return gocode.ExprIntLit(vulkanCommandLoaderTierInstance)
+	}
 }
 
 func vulkanLoaderBindLoopStmts(tier VulkanSpecIRCommandLoaderTier) []codegen.Stmt {
@@ -239,15 +393,7 @@ func vulkanLoaderBindLoopStmts(tier VulkanSpecIRCommandLoaderTier) []codegen.Stm
 			gocode.StmtShortVarDecl("addr", resolveAddr),
 			gocode.StmtIf(
 				gocode.ExprBinary(gocode.BinaryOpEq, gocode.ExprIdent("addr"), gocode.ExprIntLit(0)),
-				gocode.StmtBlock(
-					gocode.StmtReturn(
-						gocode.ExprCall(
-							gocode.ExprIdent("fmt.Errorf"),
-							gocode.ExprStringLit("vulkan loader: missing entry point %q"),
-							gocode.ExprSelector(commandIdent, "debugName"),
-						),
-					),
-				),
+				gocode.StmtBlock(vulkanLoaderMissingEntryPointReturnStmt(tier, commandIdent)...),
 			),
 			gocode.StmtIfWithInit(
 				gocode.StmtShortVarDecl(

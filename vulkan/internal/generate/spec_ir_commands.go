@@ -17,6 +17,7 @@ func vulkanSpecIRCommandsCollect(root *xmlSpecNode, registry VulkanSpecIRTypeReg
 	vulkanSpecIRCommandsCollectWalk(root, registry, byName, &aliasOnly)
 	vulkanSpecIRCommandsApplyAliases(byName, aliasOnly)
 	vulkanSpecIRCommandsFinalizeTiers(byName, aliasOnly)
+	vulkanSpecIRCommandsFinalizeEndpoints(byName, aliasOnly)
 
 	commands := make([]VulkanSpecIRCommand, 0, len(byName)+len(aliasOnly))
 	for _, command := range byName {
@@ -82,15 +83,16 @@ func vulkanSpecIRCommandCollect(
 	}
 
 	command := VulkanSpecIRCommand{
-		Name:          name,
-		PFNTypeName:   vulkanSpecIRCommandPFNTypeName(name),
-		ReturnGoType:  returnGoType,
-		ReturnsUnsafe: returnsUnsafe,
-		Params:        params,
-		LoaderTier:    vulkanSpecIRCommandLoaderTierInfer(name, params),
-		GoFieldName:   vulkanSpecIRCommandGoFieldName(name),
-		XMLDoc:        xmlSpecNodeDirectCommentsCollect(cmdNode),
-		APIPriority:   vulkanSpecIRCommandPriority(cmdNode),
+		Name:            name,
+		PFNTypeName:     vulkanSpecIRCommandPFNTypeName(name),
+		ReturnGoType:    returnGoType,
+		ReturnsUnsafe:   returnsUnsafe,
+		Params:          params,
+		LoaderTier:      vulkanSpecIRCommandLoaderTierInfer(name, params),
+		CommandEndpoint: vulkanSpecIRCommandEndpointInfer(name, params),
+		GoFieldName:     vulkanSpecIRCommandGoFieldName(name),
+		XMLDoc:          xmlSpecNodeDirectCommentsCollect(cmdNode),
+		APIPriority:     vulkanSpecIRCommandPriority(cmdNode),
 	}
 
 	existing, exists := byName[name]
@@ -142,6 +144,59 @@ func vulkanSpecIRCommandsFinalizeTiers(
 			aliasOnly[i].LoaderTier = VulkanCommandLoaderTierInstance
 		}
 	}
+}
+
+func vulkanSpecIRCommandsFinalizeEndpoints(
+	byName map[string]VulkanSpecIRCommand,
+	aliasOnly []VulkanSpecIRCommand,
+) {
+	for i := range aliasOnly {
+		if aliasOnly[i].CommandEndpoint != "" {
+			continue
+		}
+		if target, ok := byName[aliasOnly[i].AliasOfName]; ok {
+			aliasOnly[i].CommandEndpoint = target.CommandEndpoint
+		} else {
+			aliasOnly[i].CommandEndpoint = VulkanCommandEndpointInstance
+		}
+	}
+}
+
+func vulkanSpecIRCommandParamBaseType(goType string) string {
+	base := strings.TrimPrefix(goType, "*")
+	return strings.TrimPrefix(base, "[]")
+}
+
+func vulkanSpecIRCommandEndpointInfer(name string, params []VulkanSpecIRFuncpointerParam) VulkanSpecIRCommandEndpoint {
+	switch vulkanSpecIRCommandLoaderTierInfer(name, params) {
+	case VulkanCommandLoaderTierGlobal:
+		return VulkanCommandEndpointGlobal
+	}
+
+	for _, param := range params {
+		base := vulkanSpecIRCommandParamBaseType(param.GoType)
+		switch {
+		case base == "VkInstance":
+			return VulkanCommandEndpointInstance
+		case base == "VkPhysicalDevice":
+			return VulkanCommandEndpointPhysicalDevice
+		case strings.HasPrefix(base, "VkSurface"):
+			return VulkanCommandEndpointSurface
+		case base == "VkSwapchainKHR":
+			return VulkanCommandEndpointSwapchain
+		case base == "VkDevice":
+			return VulkanCommandEndpointDevice
+		case base == "VkQueue":
+			return VulkanCommandEndpointQueue
+		case base == "VkCommandBuffer":
+			return VulkanCommandEndpointCommandBuffer
+		}
+	}
+
+	if vulkanSpecIRCommandLoaderTierInfer(name, params) == VulkanCommandLoaderTierDevice {
+		return VulkanCommandEndpointDevice
+	}
+	return VulkanCommandEndpointInstance
 }
 
 func vulkanSpecIRCommandLoaderTierInfer(name string, params []VulkanSpecIRFuncpointerParam) VulkanSpecIRCommandLoaderTier {

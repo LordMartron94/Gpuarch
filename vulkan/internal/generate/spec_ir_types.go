@@ -168,21 +168,38 @@ const (
 )
 
 /*
+VulkanSpecIRCommandEndpoint groups commands on VulkanCommands by the primary dispatchable handle.
+*/
+type VulkanSpecIRCommandEndpoint string
+
+const (
+	VulkanCommandEndpointGlobal         VulkanSpecIRCommandEndpoint = "global"
+	VulkanCommandEndpointInstance       VulkanSpecIRCommandEndpoint = "instance"
+	VulkanCommandEndpointPhysicalDevice VulkanSpecIRCommandEndpoint = "physical_device"
+	VulkanCommandEndpointSurface        VulkanSpecIRCommandEndpoint = "surface"
+	VulkanCommandEndpointSwapchain      VulkanSpecIRCommandEndpoint = "swapchain"
+	VulkanCommandEndpointDevice         VulkanSpecIRCommandEndpoint = "device"
+	VulkanCommandEndpointQueue          VulkanSpecIRCommandEndpoint = "queue"
+	VulkanCommandEndpointCommandBuffer  VulkanSpecIRCommandEndpoint = "command_buffer"
+)
+
+/*
 VulkanSpecIRCommand is one Vulkan command from <commands> in vk.xml.
 
 PFNTypeName is the loader typedef name (for example PFN_vkCreateInstance). AliasOf is set for
 registry command aliases that share another command's signature.
 */
 type VulkanSpecIRCommand struct {
-	Name          string
-	PFNTypeName   string
-	ReturnGoType  string
-	ReturnsUnsafe bool
-	Params        []VulkanSpecIRFuncpointerParam
-	AliasOf       string
-	AliasOfName   string
-	LoaderTier    VulkanSpecIRCommandLoaderTier
-	GoFieldName   string
-	XMLDoc        string
-	APIPriority   int
+	Name            string
+	PFNTypeName     string
+	ReturnGoType    string
+	ReturnsUnsafe   bool
+	Params          []VulkanSpecIRFuncpointerParam
+	AliasOf         string
+	AliasOfName     string
+	LoaderTier      VulkanSpecIRCommandLoaderTier
+	CommandEndpoint VulkanSpecIRCommandEndpoint
+	GoFieldName     string
+	XMLDoc          string
+	APIPriority     int
 }

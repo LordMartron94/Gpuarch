@@ -179,25 +179,28 @@ func main() {
         panic(err)
     }
 
-    var global loader.VulkanGlobalCommands
-    if err := loader.VulkanGlobalCommandsLoad(module, &global); err != nil {
+    var commands loader.VulkanCommands
+    if err := loader.VulkanCommandsLoadGlobal(module, &commands); err != nil {
         panic(err)
     }
 
-    // Call through holder fields, e.g. global.CreateInstance(...)
+    // Call through endpoint fields, e.g. commands.Global.CreateInstance(...)
 }
 ```
 
 Selective loading (smaller proc resolve set, extension-friendly):
 
 ```go
+var commands loader.VulkanCommands
 var manifest loader.VulkanCommandManifest
 loader.VulkanCommandManifestReset(&manifest)
-loader.VulkanCommandManifestAddCreateInstance(&manifest, &global.CreateInstance)
+loader.VulkanCommandManifestAddCreateInstance(&manifest)
 
 // After vkCreateInstance: pass real instance and device handles (device may be 0).
-err := loader.VulkanCommandsLoadManifest(module, instance, device, &manifest)
+err := loader.VulkanCommandsLoadManifest(module, instance, device, &manifest, &commands)
 ```
+
+Register every command you will call on the manifest. Unloaded PFN fields on `VulkanCommands` stay nil; calling them panics with a nil pointer dereference.
 
 Typed manifest helpers (`VulkanCommandManifestAddCreateInstance`, etc.) are generated in `loader_manifest_gen.go`.
 

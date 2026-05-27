@@ -3,8 +3,11 @@ package main
 import (
 	"codegen"
 	gocode "codegen/go"
+	"fmt"
+	"foundation/system"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -45,16 +48,16 @@ func generateLoaderManifestContent(commands []VulkanSpecIRCommand, loaderDir str
 	blankLine(&elements)
 	elements = append(elements, vulkanLoaderManifestTypedAddElements(filtered)...)
 
-	return writeLoaderFile(loaderDir, loaderManifestFile, elements)
+	if err := writeLoaderFile(loaderDir, loaderManifestFile, elements); err != nil {
+		return err
+	}
+	return writeVulkanCommandsManifestTargetTable(loaderDir, filtered)
 }
 
 func loaderManifestFilePreamble() []codegen.FileElement {
 	elements := make([]codegen.FileElement, 0, 8)
 	elements = append(elements, gocode.GoGeneratedFileHeader(vulkanLoaderGeneratorTool, time.Now())...)
 	elements = append(elements, gocode.FileElementFrom(gocode.DeclPackage("loader")))
-	elements = append(elements, gocode.FileElementFrom(gocode.DeclImportBlock(
-		vulkanLoaderBindingsImport,
-	)))
 	blankLine(&elements)
 	return elements
 }
@@ -139,7 +142,6 @@ func vulkanLoaderManifestTierIntLit(tier VulkanSpecIRCommandLoaderTier) *gocode.
 func vulkanLoaderManifestEntryTypeDecl() gocode.TypeStructDecl {
 	return gocode.DeclTypeStruct("vulkanCommandManifestEntry", []gocode.StructFieldDecl{
 		gocode.StructFieldTypeDoc("field", gocode.TypeExprNamed("VulkanCommandManifestField"), "field selects the catalog entry."),
-		gocode.StructFieldTypeDoc("target", gocode.TypeExprNamed("any"), "target is the PFN field pointer to bind."),
 	}, "vulkanCommandManifestEntry is one command registered on VulkanCommandManifest.")
 }
 
@@ -157,16 +159,11 @@ func vulkanLoaderManifestTypedAddElements(commands []VulkanSpecIRCommand) []code
 func vulkanLoaderManifestTypedAddDecl(command VulkanSpecIRCommand) gocode.FuncDecl {
 	funcName := "VulkanCommandManifestAdd" + command.GoFieldName
 	fieldConst := vulkanLoaderManifestFieldConstantName(command.GoFieldName)
-	pfnType, err := gocode.TypeExprFromGoTypeString(vulkanLoaderQualifyBindingsType(command.PFNTypeName))
-	if err != nil {
-		pfnType = gocode.TypeExprNamed(command.PFNTypeName)
-	}
 
 	return gocode.DeclFunc(
 		funcName,
 		[]gocode.ParamType{
 			{Name: "manifest", Type: gocode.TypeExprPointer(gocode.TypeExprNamed("VulkanCommandManifest"))},
-			{Name: "target", Type: gocode.TypeExprPointer(pfnType)},
 		},
 		[]gocode.TypeExpr{gocode.TypeExprNamed("error")},
 		gocode.StmtBlock(
@@ -175,9 +172,34 @@ func vulkanLoaderManifestTypedAddDecl(command VulkanSpecIRCommand) gocode.FuncDe
 					gocode.ExprIdent("VulkanCommandManifestAdd"),
 					gocode.ExprIdent("manifest"),
 					gocode.ExprIdent(fieldConst),
-					gocode.ExprIdent("target"),
 				),
 			),
 		),
 	)
+}
+
+func writeVulkanCommandsManifestTargetTable(loaderDir string, commands []VulkanSpecIRCommand) error {
+	var body strings.Builder
+	body.WriteString("\n/*\nvulkanCommandsManifestTargetByField maps VulkanCommandManifestField to a PFN holder on VulkanCommands.\n*/\n")
+	body.WriteString("var vulkanCommandsManifestTargetByField = [...]func(*VulkanCommands) any{\n")
+	body.WriteString("\tnil,\n")
+	for _, command := range commands {
+		endpoint := vulkanLoaderEndpointGoName(command.CommandEndpoint)
+		body.WriteString(fmt.Sprintf(
+			"\tfunc(c *VulkanCommands) any { return &c.%s.%s },\n",
+			endpoint,
+			command.GoFieldName,
+		))
+	}
+	body.WriteString("}\n")
+
+	path := system.PathJoin(loaderDir, loaderManifestFile)
+	existingBytes, err := system.FileReadAllBytes(path)
+	if err != nil {
+		return fmt.Errorf("read %s: %w", loaderManifestFile, err)
+	}
+	if err := system.FileWriteString(path, string(existingBytes)+body.String()); err != nil {
+		return fmt.Errorf("append manifest target table: %w", err)
+	}
+	return nil
 }
