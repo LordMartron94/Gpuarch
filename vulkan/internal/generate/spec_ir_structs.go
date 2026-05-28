@@ -206,8 +206,6 @@ func vulkanSpecIRMemberCTypeGo(cType string) (string, bool) {
 		return "byte", true
 	case "void":
 		return "unsafe.Pointer", true
-	case "VkBool32":
-		return "uint32", true
 	case "VkDeviceSize":
 		return "uint64", true
 	case "VkDeviceAddress":

@@ -2,7 +2,7 @@ Vulkan Registry XML tree (debug)
 Source: /home/user/Git Repos/Projects/vertex-siege/libs/gpuarch/vulkan/internal/spec/vulkan_spec.xml
 Debug output: /home/user/Git Repos/Projects/vertex-siege/libs/gpuarch/vulkan/internal/spec/vulkan_spec_debug.txt
 
-=== Registry summary (depth-1 sections) ===
+=== Document summary (depth-1 sections) ===
 Root: <registry> (388 top-level children)
   <comment> → 0 children text="Copyright 2015-2026 The Khronos Group Inc.\n\nSPDX-License-Identifier: Apache-2.0 OR MIT"
   <comment> → 0 children text="This file, vk.xml, is the Vulkan API Registry. It is a critically important\nand normative part of the Vulkan Specificati..."
